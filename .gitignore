@@ -37,18 +37,5 @@ hs_err_pid*
 .idea/dynamic.xml
 .idea/uiDesigner.xml
 
-# Gradle:
-.idea/gradle.xml
-.idea/libraries
-
-## File-based project format:
-*.iws
-
-## Plugin-specific files:
-
 # IntelliJ
 /out/
-
-# mpeltonen/sbt-idea plugin
-.idea_modules/
-
