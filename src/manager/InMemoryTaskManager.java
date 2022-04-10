@@ -137,8 +137,9 @@ public class InMemoryTaskManager implements TaskManager {
         uin += 1;
         subTasks.put(uin, subtask);
         subtask.setUin(uin);
-        subtask.setStatus(Status.NEW);
+        subtask.setStatus(subtask.getStatus());
         epic.addSubTaskToEpicList(subtask);
+        epic.setStatus(calculateEpicStatus(epic));
 
     }
 
@@ -203,21 +204,25 @@ public class InMemoryTaskManager implements TaskManager {
 
     //расчет статуса для эпика
     public Status calculateEpicStatus(Epic epic) {
-        int counter = 0;
+        int doneCounter = 0;
+        int newCounter = 0;
+
         if (epic.getSubTasks().isEmpty()) {
             return Status.NEW;
         }
 
         for (SubTask task : epic.getSubTasks()) {
-            if (!task.getStatus().equals(Status.DONE)) {
-                counter++;
+            if (task.getStatus().equals(Status.DONE)) {
+                doneCounter++;
+            }else if(task.getStatus().equals(Status.NEW)){
+                newCounter++;
             }
         }
-        if (counter == 0) {
+        if (doneCounter == epic.getSubTasks().size()) {
             return Status.DONE;
-        } else {
-            return Status.IN_PROGRESS;
-        }
+        } else if(newCounter == epic.getSubTasks().size()){
+            return Status.NEW;
+        }else return Status.IN_PROGRESS;
     }
 
     //методы для вывода в консоль статусов задач
@@ -256,13 +261,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
 
-    Task getTaskUniversal(int id) {
+   public Task getTaskUniversal(int id) {
         if (epics.containsKey(id)) {
             return epics.get(id);
         } else if (tasks.containsKey(id)) {
             return tasks.get(id);
         } else return subTasks.getOrDefault(id, null);
     }
+
 }
 
 

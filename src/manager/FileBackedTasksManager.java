@@ -54,8 +54,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     static FileBackedTasksManager loadFromFile(File file) {
-        List<String> listOfStrings = null;
-        FileBackedTasksManager manager = null;
+        List<String> listOfStrings;
+        FileBackedTasksManager manager;
         try {
             listOfStrings = new ArrayList<>(Files.readAllLines(Paths.get(file.getName())));
             Task task;
@@ -87,14 +87,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
         manager.setUin(manager.epics.size() + manager.tasks.size() + manager.subTasks.size());
         return manager;
-    }
-
-    static List<String> splitFileToList(String fileName) {
-        try {
-            return new ArrayList<>(Files.readAllLines(Paths.get(fileName)));
-        } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при сохранении");
-        }
     }
 
     public void save() {
