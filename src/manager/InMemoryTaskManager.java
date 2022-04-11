@@ -69,7 +69,6 @@ public class InMemoryTaskManager implements TaskManager {
         return tasksNames;
     }
 
-
     public ArrayList<String> getEpicsNames() {
         ArrayList<String> tasksNames = new ArrayList<>();
         for (Epic epic : getAllEpicsList()) {
@@ -125,7 +124,6 @@ public class InMemoryTaskManager implements TaskManager {
             return null;
     }
 
-    //Создание задачи. Объект передается в качестве параметра
     public void createTask(Task task) {
         uin += 1;
         tasks.put(uin, task);
@@ -191,7 +189,6 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
 
-    // получение списка всех подзадач определенного эпика
     public List<SubTask> getSubtasks(Epic epic) {
         return epic.getSubTasks();
     }
@@ -202,7 +199,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
 
-    //расчет статуса для эпика
+
     public Status calculateEpicStatus(Epic epic) {
         int doneCounter = 0;
         int newCounter = 0;

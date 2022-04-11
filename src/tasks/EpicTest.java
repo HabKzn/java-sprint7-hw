@@ -44,7 +44,6 @@ class EpicTest {
 
     @Test
     void calculateEpicStatusIfNoSubtasks() {
-
         Task epic = manager.getTaskUniversal(3);
         Assertions.assertEquals(epic.getStatus(), Status.NEW);
     }
