@@ -150,18 +150,24 @@ public class InMemoryTaskManager implements TaskManager {
 
     //Обновление задач.
     public void updateEpic(Epic epic) {
-        epics.put(epic.getId(), epic);
+        if (epics.containsKey(epic.getId())) {
+            epics.put(epic.getId(), epic);
+        }
     }
 
 
     public void updateTask(Task task) {
-        tasks.put(task.getId(), task);
+        if (tasks.containsKey(task.getId())) {
+            tasks.put(task.getId(), task);
+        }
     }
 
 
     public void updateSubTask(SubTask subtask) {
-        subTasks.put(subtask.getId(), subtask);
-        subtask.getEpic().setStatus(calculateEpicStatus(subtask.getEpic()));
+        if (subTasks.containsKey(subtask.getId())) {
+            subTasks.put(subtask.getId(), subtask);
+            subtask.getEpic().setStatus(calculateEpicStatus(subtask.getEpic()));
+        }
     }
 
 

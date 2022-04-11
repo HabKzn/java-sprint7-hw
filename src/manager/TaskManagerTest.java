@@ -2,6 +2,7 @@ package manager;
 
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
+import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
 
@@ -161,18 +162,99 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(1, emptyManager.getAllTasksList().size());
     }
 
+    @Test
     void createSubTaskWithNotEmptyTaskList() {
-        Task task = new Task("newTaskName", "NewTaskDescription");
-        assertEquals(1, filledManager.getAllTasksList().size());
-        filledManager.createTask(task);
-        assertEquals(2, filledManager.getAllTasksList().size());
+        Epic epic = new Epic("epicname", "epicdescription");
+        SubTask subtask = new SubTask("subtaskname", "subtaskdescription", epic);
+        assertEquals(1, filledManager.getAllSubTasksList().size());
+        filledManager.createSubTask(subtask, epic);
+        assertEquals(2, filledManager.getAllSubTasksList().size());
     }
 
+    @Test
     void createSubTaskWithEmptyTaskList() {
-        Task task = new Task("newTaskName", "NewTaskDescription");
-        assertEquals(1, filledManager.getAllTasksList().size());
-        filledManager.createTask(task);
-        assertEquals(2, filledManager.getAllTasksList().size());
+        Epic epic = new Epic("epicname", "epicdescription");
+        SubTask subtask = new SubTask("subtaskname", "subtaskdescription", epic);
+        assertEquals(0, emptyManager.getAllSubTasksList().size());
+        emptyManager.createSubTask(subtask, epic);
+        assertEquals(1, emptyManager.getAllSubTasksList().size());
     }
+
+    @Test
+    void createEpicWithNotEmptyEpicList() {
+        Epic epic = new Epic("epicname", "epicdescription");
+        assertEquals(1, filledManager.getAllEpicsList().size());
+        filledManager.createEpic(epic);
+        assertEquals(2, filledManager.getAllEpicsList().size());
+    }
+
+    @Test
+    void createEpicWithEmptyEpicList() {
+        Epic epic = new Epic("epicname", "epicdescription");
+        assertEquals(0, emptyManager.getAllEpicsList().size());
+        emptyManager.createEpic(epic);
+        assertEquals(1, emptyManager.getAllEpicsList().size());
+    }
+
+    @Test
+    void updateEpicIfEpicListNotEmpty() {
+        assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.NEW);
+        assertEquals(filledManager.getAllEpicsList().size(), 1);
+        Epic epic = filledManager.getAllEpicsList().get(0);
+        epic.setStatus(Status.DONE);
+        filledManager.updateEpic(epic);
+        assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.DONE);
+        assertEquals(filledManager.getAllEpicsList().size(), 1);
+    }
+
+    @Test
+    void updateEpicIfEpicListIsEmpty() {
+        Epic epic = new Epic("name", "Surname");
+        epic.setStatus(Status.DONE);
+        emptyManager.updateEpic(epic);
+        assertNull(emptyManager.getTaskUniversal(epic.getId()));
+        assertEquals(emptyManager.getAllEpicsList().size(), 0);
+    } @Test
+//
+//    void updateSubtaskIfListNotEmpty() {
+//        assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.NEW);
+//        assertEquals(filledManager.getAllEpicsList().size(), 1);
+//        Epic epic = filledManager.getAllEpicsList().get(0);
+//        epic.setStatus(Status.DONE);
+//        filledManager.updateEpic(epic);
+//        assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.DONE);
+//        assertEquals(filledManager.getAllEpicsList().size(), 1);
+//    }
+//
+//    @Test
+//    void updateSubtaskIfListIsEmpty() {
+//        Epic epic = new Epic("name", "Surname");
+//        epic.setStatus(Status.DONE);
+//        emptyManager.updateEpic(epic);
+//        assertNull(emptyManager.getTaskUniversal(epic.getId()));
+//        assertEquals(emptyManager.getAllEpicsList().size(), 0);
+//    }
+//
+//    @Test
+//    void updateTaskIfListNotEmpty() {
+//        assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.NEW);
+//        assertEquals(filledManager.getAllEpicsList().size(), 1);
+//        Epic epic = filledManager.getAllEpicsList().get(0);
+//        epic.setStatus(Status.DONE);
+//        filledManager.updateEpic(epic);
+//        assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.DONE);
+//        assertEquals(filledManager.getAllEpicsList().size(), 1);
+//    }
+//
+//    @Test
+//    void updateTaskIfListIsEmpty() {
+//        Epic epic = new Epic("name", "Surname");
+//        epic.setStatus(Status.DONE);
+//        emptyManager.updateEpic(epic);
+//        assertNull(emptyManager.getTaskUniversal(epic.getId()));
+//        assertEquals(emptyManager.getAllEpicsList().size(), 0);
+//    }
+
+
 
 }
