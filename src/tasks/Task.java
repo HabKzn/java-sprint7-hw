@@ -70,7 +70,7 @@ public class Task {
         if (this == o) return true;
         if (!(o instanceof Task)) return false;
         final Task task = (Task) o;
-        return getUin() == task.getUin() && getName().equals(task.getName()) && getDescription().equals(task.getDescription()) && getStatus() == task.getStatus();
+        return getUin() == task.getUin() && Objects.equals(getName(), task.getName()) && Objects.equals(getDescription(), task.getDescription()) && getStatus() == task.getStatus();
     }
 
     @Override

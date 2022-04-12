@@ -55,4 +55,30 @@ public class Epic extends Task {
     public int hashCode() {
         return Objects.hash(super.hashCode(), getSubTasks());
     }
+
+    public Status calculateEpicStatus() {
+        int doneCounter = 0;
+        int newCounter = 0;
+
+        if (getSubTasks().isEmpty()) {
+            return Status.NEW;
+        }
+
+        for (SubTask task : getSubTasks()) {
+            if (task.getStatus().equals(Status.DONE)) {
+                doneCounter++;
+            }else if(task.getStatus().equals(Status.NEW)){
+                newCounter++;
+            }
+        }
+        if (doneCounter == getSubTasks().size()) {
+            return Status.DONE;
+        } else if(newCounter == getSubTasks().size()){
+            return Status.NEW;
+        }else return Status.IN_PROGRESS;
+    }
+
+    public List<SubTask> getSubtasks() {
+        return subTasks;
+    }
 }

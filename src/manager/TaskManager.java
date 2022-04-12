@@ -44,23 +44,7 @@ public interface TaskManager {
 
     void deleteSubTaskById(int id);
 
-    List<SubTask> getSubtasks(Epic epic);
-
      List<Task> history();
-
-    List<String> getEpicsNames();
-
-    List<String> getTasksNames();
-
-    List<String> getSubTasksNames();
-
-    void printEpicsStatus();
-
-    void printSubclassesStatus();
-
-    void printTasksStatus();
-
-    void printHistory();
 
     void removeFromHistoryByID(int id);
 

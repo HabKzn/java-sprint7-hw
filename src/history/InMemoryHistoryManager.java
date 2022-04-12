@@ -72,19 +72,27 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public List<Task> getTasks() {
         List<Task> tasks = new ArrayList<>();
-         Node<Task> thisNode = this.head;
-        if(thisNode != null){
-         while (thisNode.next != null) {
+        Node<Task> thisNode = this.head;
+        if (thisNode != null) {
+            while (thisNode.next != null) {
+                tasks.add(thisNode.data);
+                thisNode = thisNode.next;
+            }
             tasks.add(thisNode.data);
-            thisNode = thisNode.next;
         }
-        tasks.add(thisNode.data);
-        return tasks;}
-        else return null;
+        return tasks;
+    }
+
+    @Override
+    public int getSize() {
+        return size;
     }
 
     @Override
     public void remove(int id) {
-        map.remove(id);
+        if (map.containsKey(id)) {
+            removeNode(map.get(id));
+            map.remove(id);
+        }
     }
 }

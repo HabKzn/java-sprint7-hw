@@ -50,33 +50,6 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(subTasks.values());
     }
 
-    // получение списков имен задач
-
-    public ArrayList<String> getTasksNames() {
-        ArrayList<String> tasksNames = new ArrayList<>();
-        for (Task task : getAllTasksList()) {
-            tasksNames.add(task.getName());
-        }
-        return tasksNames;
-    }
-
-
-    public ArrayList<String> getSubTasksNames() {
-        ArrayList<String> tasksNames = new ArrayList<>();
-        for (SubTask subTask : getAllSubTasksList()) {
-            tasksNames.add(subTask.getName());
-        }
-        return tasksNames;
-    }
-
-    public ArrayList<String> getEpicsNames() {
-        ArrayList<String> tasksNames = new ArrayList<>();
-        for (Epic epic : getAllEpicsList()) {
-            tasksNames.add(epic.getName());
-        }
-        return tasksNames;
-    }
-
     //удаление всех задач
     @Override
     public void clearTasks() {
@@ -110,7 +83,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getSubTaskByUin(int uin) {
         if (subTasks.get(uin) != null) {
             memoryManager.add(subTasks.get(uin));
-            return tasks.get(uin);
+            return subTasks.get(uin);
         } else
             return null;
     }
@@ -119,7 +92,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getEpicByUin(int uin) {
         if (epics.get(uin) != null) {
             memoryManager.add(epics.get(uin));
-            return tasks.get(uin);
+            return epics.get(uin);
         } else
             return null;
     }
@@ -137,7 +110,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtask.setUin(uin);
         subtask.setStatus(subtask.getStatus());
         epic.addSubTaskToEpicList(subtask);
-        epic.setStatus(calculateEpicStatus(epic));
+        epic.setStatus(epic.calculateEpicStatus());
 
     }
 
@@ -166,7 +139,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubTask(SubTask subtask) {
         if (subTasks.containsKey(subtask.getId())) {
             subTasks.put(subtask.getId(), subtask);
-            subtask.getEpic().setStatus(calculateEpicStatus(subtask.getEpic()));
+            subtask.getEpic().setStatus(subtask.getEpic().calculateEpicStatus());
         }
     }
 
@@ -174,29 +147,27 @@ public class InMemoryTaskManager implements TaskManager {
     //Методы для удаления по ID(Вместе с эпиком удаляются и подзадачи)
     @Override
     public void deleteEpicById(int id) {
+       if (epics.containsKey(id)){
         for (SubTask subtask : epics.get(id).getSubTasks()) {
             subTasks.remove(subtask.getId());
             removeFromHistoryByID(subtask.getId());
         }
         epics.remove(id);
-        removeFromHistoryByID(id);
+        removeFromHistoryByID(id);}
     }
 
     @Override
     public void deleteTaskById(int id) {
-        tasks.remove(id);
-        removeFromHistoryByID(id);
+        if(tasks.containsKey(id))
+        {tasks.remove(id);
+        removeFromHistoryByID(id);}
     }
 
     @Override
     public void deleteSubTaskById(int id) {
-        subTasks.remove(id);
-        removeFromHistoryByID(id);
-    }
-
-
-    public List<SubTask> getSubtasks(Epic epic) {
-        return epic.getSubTasks();
+        if(subTasks.containsKey(id)){
+            subTasks.remove(id);
+        removeFromHistoryByID(id);}
     }
 
     @Override
@@ -204,59 +175,6 @@ public class InMemoryTaskManager implements TaskManager {
         return memoryManager.getTasks();
     }
 
-
-
-    public Status calculateEpicStatus(Epic epic) {
-        int doneCounter = 0;
-        int newCounter = 0;
-
-        if (epic.getSubTasks().isEmpty()) {
-            return Status.NEW;
-        }
-
-        for (SubTask task : epic.getSubTasks()) {
-            if (task.getStatus().equals(Status.DONE)) {
-                doneCounter++;
-            }else if(task.getStatus().equals(Status.NEW)){
-                newCounter++;
-            }
-        }
-        if (doneCounter == epic.getSubTasks().size()) {
-            return Status.DONE;
-        } else if(newCounter == epic.getSubTasks().size()){
-            return Status.NEW;
-        }else return Status.IN_PROGRESS;
-    }
-
-    //методы для вывода в консоль статусов задач
-    public void printEpicsStatus() {
-        for (Epic epic : getAllEpicsList()) {
-            System.out.println(epic.getDescription() + " со статусом:           " + epic.getStatus());
-        }
-    }
-
-    public void printSubclassesStatus() {
-        for (SubTask subTask : getAllSubTasksList()) {
-            System.out.println(subTask.getDescription() + " со статусом:           " + subTask.getStatus());
-        }
-    }
-
-    public void printTasksStatus() {
-        for (Task task : getAllTasksList()) {
-            System.out.println(task.getDescription() + " со статусом:           " + task.getStatus());
-        }
-    }
-
-    @Override
-    public void printHistory() {
-        if (history().size() == 0) {
-            System.out.println("Просмотренных задач нет");
-        } else {
-            for (int i = history().size() - 1; i >= 0; i--) {
-                System.out.println(history().get(i).getName());
-            }
-        }
-    }
 
     @Override
     public void removeFromHistoryByID(final int id) {

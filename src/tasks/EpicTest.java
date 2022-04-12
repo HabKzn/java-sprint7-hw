@@ -1,9 +1,10 @@
 package tasks;
 
 import manager.InMemoryTaskManager;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EpicTest {
     static Epic epc1 = new Epic("epc1", "this is epic N1");
@@ -45,30 +46,44 @@ class EpicTest {
     @Test
     void calculateEpicStatusIfNoSubtasks() {
         Task epic = manager.getTaskUniversal(3);
-        Assertions.assertEquals(epic.getStatus(), Status.NEW);
+        assertEquals(epic.getStatus(), Status.NEW);
     }
 
     @Test
     void calculateEpicStatusIfAllSubtasksNew() {
         Task epic = manager.getTaskUniversal(1);
-        Assertions.assertEquals(epic.getStatus(), Status.NEW);
+        assertEquals(epic.getStatus(), Status.NEW);
     }
 
     @Test
     void calculateEpicStatusIfAllSubtasksDone() {
         Task epic = manager.getTaskUniversal(2);
-        Assertions.assertEquals(epic.getStatus(), Status.DONE);
+        assertEquals(epic.getStatus(), Status.DONE);
     }
 
     @Test
     void calculateEpicStatusIfSubtasksNewAndDone() {
         Task epic = manager.getTaskUniversal(11);
-        Assertions.assertEquals(epic.getStatus(), Status.IN_PROGRESS);
+        assertEquals(epic.getStatus(), Status.IN_PROGRESS);
     }
 
     @Test
     void calculateEpicStatusIfSubTasksInProgress() {
         Task epic = manager.getTaskUniversal(8);
-        Assertions.assertEquals(epic.getStatus(), Status.IN_PROGRESS);
+        assertEquals(epic.getStatus(), Status.IN_PROGRESS);
     }
+
+    @Test
+    void getSubTasksWhileSubTasksListFilled() {
+        Epic epic = (Epic) manager.getEpicByUin(1);
+        assertEquals(epic.getSubtasks().size(), 2);
+    }
+
+    @Test
+    void getSubTasksWhileSubTasksListIsEmpty() {
+        Epic epic = (Epic) manager.getEpicByUin(3);
+        assertEquals(epic.getSubtasks().size(), 0);
+    }
+
+
 }

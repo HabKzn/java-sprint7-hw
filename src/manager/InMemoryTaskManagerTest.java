@@ -12,10 +12,9 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         filledManager = new InMemoryTaskManager();
         emptyManager = new InMemoryTaskManager();
 
-
-        Task task = new Task("name", "description");
-        Epic epic = new Epic("epicName", "epicDescription");
-        SubTask subTask = new SubTask("subTaskName", "subTaskDescription", epic);
+        Task task = new Task("name", "description");  //id = 3
+        Epic epic = new Epic("epicName", "epicDescription");  // id = 1
+        SubTask subTask = new SubTask("subTaskName", "subTaskDescription", epic); //id = 2
 
         filledManager.createEpic(epic);
         filledManager.createSubTask(subTask, epic);
