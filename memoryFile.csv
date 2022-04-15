@@ -1,4 +1,9 @@
 id,type,name,status,description,epic,startTime,duration,endTime
-1,EPIC,epc1,NEW,this is epic N1,2022-04-16T10:00,PT2H,null
-2,EPIC,epc2,NEW,this is epic N2,2022-04-16T12:00,PT2H,null
+3,SUBTASK,sbt1,NEW,this is subtask1,1,2022-04-16T10:00,PT1H,2022-04-16T11:00
+4,SUBTASK,sbt2,NEW,this is subtask2,1,2022-04-16T11:00,PT1H,2022-04-16T12:00
+5,SUBTASK,sbt3,NEW,this is subtask3,2,2022-04-16T12:00,PT1H,2022-04-16T13:00
+6,SUBTASK,sbt4,NEW,this is subtask4,2,2022-04-16T13:00,PT1H,2022-04-16T14:00
+1,EPIC,epc1,NEW,this is epic N1,2022-04-16T10:00,PT2H,2022-04-16T12:00
+2,EPIC,epc2,NEW,this is epic N2,2022-04-16T12:00,PT2H,2022-04-16T14:00
 
+1,2,6,5,4,3

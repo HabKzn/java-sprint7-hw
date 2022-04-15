@@ -15,6 +15,29 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 abstract class TaskManagerTest<T extends TaskManager> {
     T emptyManager;
     T filledManager;
+    Task task = new Task("name", "description",
+            LocalDateTime.of(2022, 4, 17, 10, 0), Duration.ofMinutes(50));
+
+    Epic epic1 = new Epic("epic1Name", "epic1Description");
+
+    SubTask subTask11 = new SubTask("subTask11Name", "subTask11Description", epic1,
+            LocalDateTime.of(2022, 4, 16, 10, 0), Duration.ofMinutes(60));
+
+    SubTask subTask12 = new SubTask("subTask12Name", "subTask12Description", epic1,
+            LocalDateTime.of(2022, 4, 16, 11, 0), Duration.ofMinutes(60));
+
+    Epic epic2 = new Epic("epic2Name", "epic2Description");
+
+    SubTask subTask21 = new SubTask("subTask21Name", "subTask21Description", epic2,
+            LocalDateTime.of(2022, 4, 16, 13, 0), Duration.ofMinutes(60));
+
+
+    String taskTestString = "1,TASK,name,NEW,description,2022-04-17T10:00,PT50M,2022-04-17T10:50";
+    String epic1TestString = "2,EPIC,epic1Name,NEW,epic1Description,2022-04-16T10:00,PT2H,2022-04-16T12:00";
+    String subTask11TestString = "3,SUBTASK,subTask11Name,NEW,subTask11Description,2,2022-04-16T10:00,PT1H,2022-04-16T11:00";
+    String subTask12TestString = "4,SUBTASK,subTask12Name,NEW,subTask12Description,2,2022-04-16T11:00,PT1H,2022-04-16T12:00";
+    String epic2TestString = "5,EPIC,epic2Name,DONE,epic2Description,2022-04-16T13:00,PT2H,2022-04-16T14:00";
+    String subTask21TestString = "6,SUBTASK,subTask21Name,DONE,subTask21Description,5,2022-04-16T13:00,PT1H,2022-04-16T14:00";
 
 
     @Test
@@ -55,7 +78,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void getAllEpicsListWhileEpicsArePresent() {
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
     }
 
     @Test
@@ -75,7 +98,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void getAllSubTasksListWhileSubTasksArePresent() {
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
     }
 
     @Test
@@ -91,10 +114,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void getTaskByUinWithFilledTasksList() {
-        Task task = new Task("name", "description");
-        task.setUin(3);
-        assertEquals(filledManager.getTaskByUin(3), task);
-        assertEquals(filledManager.history().get(0).getId(), 3);
+        assertEquals(filledManager.getTaskByUin(1).toString(), taskTestString);
+        assertEquals(filledManager.history().get(0).getId(), 1);
     }
 
     @Test
@@ -130,14 +151,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void getSubTaskByUinWithFilledTasksList() {
-        Epic epic = new Epic("epicName", "epicDescription");
-        epic.setUin(1);
-        SubTask subTask = new SubTask("subTaskName", "subTaskDescription", epic,
-                LocalDateTime.of(2022, 4,17, 10, 0), Duration.ofMinutes(50));
-        subTask.setUin(2);
-
-        assertEquals(filledManager.getSubTaskByUin(2).toString(), subTask.toString());
-        assertEquals(filledManager.history().get(0).getId(), 2);
+        assertEquals(filledManager.getSubTaskByUin(3).toString(), subTask11TestString);
+        assertEquals(filledManager.history().get(0).getId(), 3);
     }
 
     @Test
@@ -164,12 +179,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void createSubTaskWithNotEmptyTaskList() {
-        Epic epic = new Epic("epicname", "epicdescription");
-        SubTask subtask = new SubTask("subtaskname", "subtaskdescription", epic,
-                LocalDateTime.of(2022, 4,17, 11, 0), Duration.ofMinutes(40));
-        assertEquals(1, filledManager.getAllSubTasksList().size());
-        filledManager.createSubTask(subtask, epic);
-        assertEquals(2, filledManager.getAllSubTasksList().size());
+        SubTask subtask = new SubTask("subtaskname", "subtaskdescription",
+                 (Epic) filledManager.getTaskUniversal(2),
+                 LocalDateTime.of(2022, 4,17, 11, 0),
+                 Duration.ofMinutes(40));
+        assertEquals(3, filledManager.getAllSubTasksList().size());
+        filledManager.createSubTask(subtask, subtask.getEpic());
+        assertEquals(4, filledManager.getAllSubTasksList().size());
     }
 
     @Test
@@ -184,10 +200,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void createEpicWithNotEmptyEpicList() {
-        Epic epic = new Epic("epicname", "epicdescription");
-        assertEquals(1, filledManager.getAllEpicsList().size());
-        filledManager.createEpic(epic);
         assertEquals(2, filledManager.getAllEpicsList().size());
+        filledManager.createEpic(new Epic("name", "description"));
+        assertEquals(3, filledManager.getAllEpicsList().size());
     }
 
     @Test
@@ -201,13 +216,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void updateEpicIfEpicListNotEmpty() {
         assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.NEW);
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
-        Epic epic = new Epic("epicname", "epicdescription");
-        epic.setStatus(Status.DONE);
-        epic.setUin(1);
-        filledManager.updateEpic(epic);
-        assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.DONE);
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
+        epic1.setStatus(Status.DONE);
+        filledManager.updateEpic(epic1);
+        assertEquals(filledManager.getTaskUniversal(2).getStatus(), Status.DONE);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
     }
 
     @Test
@@ -222,14 +235,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void updateSubtaskIfListNotEmpty() {
         assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.NEW);
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
-        SubTask subtask = new SubTask("name", "Surname", new Epic("name", "Surname"),
-                LocalDateTime.of(2022, 4,17, 11, 0), Duration.ofMinutes(40));
-        subtask.setStatus(Status.DONE);
-        subtask.setUin(2);
-        filledManager.updateSubTask(subtask);
-        assertEquals(filledManager.getTaskUniversal(2).getStatus(), Status.DONE);
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
+        SubTask sbt = (SubTask) filledManager.getTaskUniversal(3);
+        sbt.setStatus(Status.DONE);
+        filledManager.updateSubTask(sbt);
+        assertEquals(filledManager.getTaskUniversal(3).getStatus(), Status.DONE);
+       assertEquals(filledManager.getTaskUniversal(2).getStatus(), Status.IN_PROGRESS);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
     }
 
     @Test
@@ -248,9 +260,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(filledManager.getAllTasksList().size(), 1);
         Task task = new Task("a", "b");
         task.setStatus(Status.DONE);
-        task.setUin(3);
+        task.setUin(1);
         filledManager.updateTask(task);
-        assertEquals(filledManager.getTaskUniversal(3).getStatus(), Status.DONE);
+        assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.DONE);
         assertEquals(filledManager.getAllTasksList().size(), 1);
     }
 
@@ -265,14 +277,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void deleteEpicByIdWhileListExists() {
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
         assertEquals(filledManager.getAllTasksList().size(), 1);
 
-        filledManager.deleteEpicById(1);
+        filledManager.deleteEpicById(2);
 
-        assertEquals(filledManager.getAllEpicsList().size(), 0);
-        assertEquals(filledManager.getAllSubTasksList().size(), 0);
+        assertEquals(filledManager.getAllEpicsList().size(), 1);
+        assertEquals(filledManager.getAllSubTasksList().size(), 1);
         assertEquals(filledManager.getAllTasksList().size(), 1);
     }
 
@@ -291,27 +303,27 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void deleteEpicByIdWhileIdIsWrong() {
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
         assertEquals(filledManager.getAllTasksList().size(), 1);
 
         filledManager.deleteEpicById(100500);
 
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
         assertEquals(filledManager.getAllTasksList().size(), 1);
     }
 
     @Test
     void deleteSubTaskByIdWhileListExists() {
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
         assertEquals(filledManager.getAllTasksList().size(), 1);
 
-        filledManager.deleteSubTaskById((2));
+        filledManager.deleteSubTaskById((3));
 
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
-        assertEquals(filledManager.getAllSubTasksList().size(), 0);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
+        assertEquals(filledManager.getAllSubTasksList().size(), 2);
         assertEquals(filledManager.getAllTasksList().size(), 1);
     }
 
@@ -330,28 +342,28 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void deleteSubTaskByIdWhileIdIsWrong() {
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
         assertEquals(filledManager.getAllTasksList().size(), 1);
 
         filledManager.deleteSubTaskById(100500);
 
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
         assertEquals(filledManager.getAllTasksList().size(), 1);
     }
 
 
     @Test
     void deleteTaskByIdWhileListExists() {
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
         assertEquals(filledManager.getAllTasksList().size(), 1);
 
-        filledManager.deleteTaskById(3);
+        filledManager.deleteTaskById(1);
 
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
         assertEquals(filledManager.getAllTasksList().size(), 0);
     }
 
@@ -370,14 +382,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void deleteTaskByIdWhileIdIsWrong() {
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
         assertEquals(filledManager.getAllTasksList().size(), 1);
 
         filledManager.deleteTaskById(100500);
 
-        assertEquals(filledManager.getAllEpicsList().size(), 1);
-        assertEquals(filledManager.getAllSubTasksList().size(), 1);
+        assertEquals(filledManager.getAllEpicsList().size(), 2);
+        assertEquals(filledManager.getAllSubTasksList().size(), 3);
         assertEquals(filledManager.getAllTasksList().size(), 1);
     }
 
@@ -388,8 +400,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void historyTestWhileHistoryListIsNotEmpty() {
-        filledManager.getSubTaskByUin(2);
-        filledManager.getTaskByUin(3);
+        filledManager.getSubTaskByUin(3);
+        filledManager.getTaskByUin(1);
         assertEquals(filledManager.history().size(), 2);
     }
 
@@ -401,16 +413,16 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void removeFromHistoryByIDWhileHistoryListIsNotEmpty() {
-        filledManager.getSubTaskByUin(2);
-        filledManager.getTaskByUin(3);
-        filledManager.removeFromHistoryByID(2);
+        filledManager.getSubTaskByUin(3);
+        filledManager.getTaskByUin(1);
+        filledManager.removeFromHistoryByID(3);
         assertEquals(filledManager.history().size(), 1);
     }
 
     @Test
     void removeFromHistoryByIDWhileIdIsWrong() {
-        filledManager.getSubTaskByUin(2);
-        filledManager.getTaskByUin(3);
+        filledManager.getSubTaskByUin(3);
+        filledManager.getTaskByUin(1);
         filledManager.removeFromHistoryByID(100500);
         assertEquals(filledManager.history().size(), 2);
     }

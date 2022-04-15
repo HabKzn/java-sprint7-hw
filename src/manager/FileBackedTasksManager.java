@@ -28,10 +28,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public static void main(String[] args)  {
         Epic epc1 = new Epic("epc1", "this is epic N1");
         Epic epc2 = new Epic("epc2", "this is epic N2");
-        SubTask sbt1 = new SubTask("sbt1", "this is subtask1", epc1, LocalDateTime.of(2022,4,16,10,0), Duration.ofMinutes(60));
-        SubTask sbt2 = new SubTask("sbt2", "this is subtask2", epc1,LocalDateTime.of(2022,4,16,11,0), Duration.ofMinutes(60));
-        SubTask sbt3 = new SubTask("sbt3", "this is subtask3", epc2,LocalDateTime.of(2022, 4,16,12,0), Duration.ofMinutes(60));
-        SubTask sbt4 = new SubTask("sbt4", "this is subtask4", epc2,LocalDateTime.of(2022,4,16,13,0), Duration.ofMinutes(60));
+
+        SubTask sbt1 = new SubTask("sbt1", "this is subtask1", epc1,
+                LocalDateTime.of(2022,4,16,10,0), Duration.ofMinutes(60));
+
+        SubTask sbt2 = new SubTask("sbt2", "this is subtask2", epc1,
+                LocalDateTime.of(2022,4,16,11,0), Duration.ofMinutes(60));
+
+        SubTask sbt3 = new SubTask("sbt3", "this is subtask3", epc2,
+                LocalDateTime.of(2022, 4,16,12,0), Duration.ofMinutes(60));
+
+        SubTask sbt4 = new SubTask("sbt4", "this is subtask4", epc2,
+                LocalDateTime.of(2022,4,16,13,0), Duration.ofMinutes(60));
 
         FileBackedTasksManager manager = new FileBackedTasksManager("memoryFile.csv");
 
@@ -73,8 +81,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             for (int i = 1; i < listOfStrings.size() - 2; i++) {
                 Task task = manager.fromString(listOfStrings.get(i));
                 if (task instanceof SubTask) {
-                    SubTask st = (SubTask)task;
-                    manager.createSubTask(st, st.getEpic());
+                    manager.createSubTask((SubTask) task, ((SubTask) task).getEpic());
                 } else if (task != null && !(task instanceof Epic)) {
                     manager.createTask(task);
                 }
@@ -89,6 +96,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             manager.memoryManager.add(manager.getTaskUniversal(historyElement));
         }
         manager.setUin(manager.epics.size() + manager.tasks.size() + manager.subTasks.size());
+        manager.save();
        return manager;
     }
 
@@ -235,7 +243,5 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             default:
                 return null;
         }
-
-
     }
 }

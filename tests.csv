@@ -1,7 +1,4 @@
 id,type,name,status,description,epic,startTime,duration,endTime
-1,TASK,name,NEW,description,2022-04-17T10:00,PT50M,2022-04-17T10:50
-3,SUBTASK,subTaskName,NEW,subTaskDescription,5,2022-04-16T13:00,PT1H,2022-04-16T14:00
-4,SUBTASK,subTaskName,NEW,subTaskDescription,5,2022-04-16T11:00,PT1H,2022-04-16T12:00
-5,EPIC,epicName,NEW,epicDescription,2022-04-16T11:00,PT2H,2022-04-16T14:00
-5,EPIC,epicName,NEW,epicDescription,2022-04-16T11:00,PT2H,2022-04-16T14:00
+1,EPIC,epic1Name,NEW,epic1Description,2022-04-16T10:00,PT2H,2022-04-16T12:00
 
+1

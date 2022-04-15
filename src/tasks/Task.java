@@ -2,7 +2,6 @@ package tasks;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class Task {
@@ -67,6 +66,7 @@ public class Task {
 
     public void setStatus(Status status) {
         this.status = status;
+
     }
 
     public Status getStatus() {

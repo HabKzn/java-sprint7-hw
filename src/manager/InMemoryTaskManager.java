@@ -108,12 +108,10 @@ public class InMemoryTaskManager implements TaskManager {
         uin += 1;
         subTasks.put(uin, subtask);
         subtask.setUin(uin);
-        subtask.setStatus(subtask.getStatus());
         epic.addSubTaskToEpicList(subtask);
         epic.setStatus(epic.calculateEpicStatus());
         epic.refreshEpicStartTime();
         epic.refreshEpicDuration();
-
     }
 
     public void createEpic(Epic epic) {

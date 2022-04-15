@@ -28,10 +28,6 @@ public class Epic extends Task {
         return subTasks;
     }
 
-    public void setSubTasks(ArrayList<SubTask> subTasks) {
-        this.subTasks = subTasks;
-    }
-
     public void addSubTaskToEpicList(SubTask subTask) {
         subTasks.add(subTask);
     }
@@ -75,6 +71,10 @@ public class Epic extends Task {
         } else if (newCounter == getSubTasks().size()) {
             return Status.NEW;
         } else return Status.IN_PROGRESS;
+    }
+
+    public void addSubtask(SubTask subtask) {
+        subTasks.add(subtask);
     }
 
     public void setEndTime(LocalDateTime endTime) {
