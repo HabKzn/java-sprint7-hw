@@ -6,6 +6,9 @@ import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -109,13 +112,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void getEpicByUinWithFilledTasksList() {
-        Epic epic = new Epic("epicName", "epicDescription");
-        epic.setUin(1);
-        SubTask subTask = new SubTask("subTaskName", "subTaskDescription", epic);
-        subTask.setUin(2);
 
-        assertEquals(filledManager.getEpicByUin(1).toString(), epic.toString());
-        assertEquals(filledManager.history().get(0).getId(), 1);
     }
 
     @Test
@@ -135,7 +132,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     public void getSubTaskByUinWithFilledTasksList() {
         Epic epic = new Epic("epicName", "epicDescription");
         epic.setUin(1);
-        SubTask subTask = new SubTask("subTaskName", "subTaskDescription", epic);
+        SubTask subTask = new SubTask("subTaskName", "subTaskDescription", epic,
+                LocalDateTime.of(2022, 4,17, 10, 0), Duration.ofMinutes(50));
         subTask.setUin(2);
 
         assertEquals(filledManager.getSubTaskByUin(2).toString(), subTask.toString());
@@ -167,7 +165,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void createSubTaskWithNotEmptyTaskList() {
         Epic epic = new Epic("epicname", "epicdescription");
-        SubTask subtask = new SubTask("subtaskname", "subtaskdescription", epic);
+        SubTask subtask = new SubTask("subtaskname", "subtaskdescription", epic,
+                LocalDateTime.of(2022, 4,17, 11, 0), Duration.ofMinutes(40));
         assertEquals(1, filledManager.getAllSubTasksList().size());
         filledManager.createSubTask(subtask, epic);
         assertEquals(2, filledManager.getAllSubTasksList().size());
@@ -176,7 +175,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void createSubTaskWithEmptyTaskList() {
         Epic epic = new Epic("epicname", "epicdescription");
-        SubTask subtask = new SubTask("subtaskname", "subtaskdescription", epic);
+        SubTask subtask = new SubTask("subtaskname", "subtaskdescription", epic,
+                LocalDateTime.of(2022, 4,17, 11, 0), Duration.ofMinutes(40));
         assertEquals(0, emptyManager.getAllSubTasksList().size());
         emptyManager.createSubTask(subtask, epic);
         assertEquals(1, emptyManager.getAllSubTasksList().size());
@@ -223,7 +223,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void updateSubtaskIfListNotEmpty() {
         assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.NEW);
         assertEquals(filledManager.getAllSubTasksList().size(), 1);
-        SubTask subtask = new SubTask("name", "Surname", new Epic("name", "Surname"));
+        SubTask subtask = new SubTask("name", "Surname", new Epic("name", "Surname"),
+                LocalDateTime.of(2022, 4,17, 11, 0), Duration.ofMinutes(40));
         subtask.setStatus(Status.DONE);
         subtask.setUin(2);
         filledManager.updateSubTask(subtask);
@@ -233,7 +234,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void updateSubtaskIfListIsEmpty() {
-        SubTask subtask = new SubTask("name", "Surname", new Epic("name", "Surname"));
+        SubTask subtask = new SubTask("name", "Surname", new Epic("name", "Surname"),
+                LocalDateTime.of(2022, 4,17, 11, 0), Duration.ofMinutes(40));
         subtask.setStatus(Status.DONE);
         emptyManager.updateSubTask(subtask);
         assertNull(emptyManager.getTaskUniversal(subtask.getId()));
@@ -415,17 +417,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void getTaskUniversalIfTaskListsNotEmpty() {
-        Task task = new Task("name", "description");
-        task.setUin(3);
-        Epic epic = new Epic("epicName", "epicDescription");
-        epic.setUin(1);
-        SubTask subTask = new SubTask("subTaskName", "subTaskDescription", epic);
-        subTask.setUin(2);
-
-        assertEquals(task.toString(), filledManager.getTaskUniversal(3).toString());
-        assertEquals(subTask.toString(), filledManager.getTaskUniversal(2).toString());
-        assertEquals(epic.toString(), filledManager.getTaskUniversal(1).toString());
-
+        System.out.println(filledManager.getTaskUniversal(4).toString());
+        System.out.println(filledManager.getTaskUniversal(3).toString());
+        System.out.println(filledManager.getTaskUniversal(2).toString());
+        System.out.println(filledManager.getTaskUniversal(1).toString());
+        System.out.println(1);
     }
 
     @Test

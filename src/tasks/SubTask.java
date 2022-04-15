@@ -1,22 +1,19 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class SubTask extends Task {
 
     private final Epic epic;
 
-    public SubTask(String name, String description, Epic epic) {
-        super(name, description);
+    public SubTask(String name, String description, Epic epic, LocalDateTime startTime, Duration duration) {
+        super(name, description, startTime, duration);
         this.epic = epic;
         setStatus(Status.NEW);
     }
-
-    public SubTask(String name, String description, Status status, Epic epic) {
-        super(name, description);
-        this.epic = epic;
-        this.setStatus(status);
-    }
+    
     @Override
     Types getType() {
         return Types.SUBTASK;
@@ -28,7 +25,8 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return getId() + "," + getType() + "," + getName() + "," + getStatus() + "," + getDescription() + "," + getEpic().getId();
+        return getId() + "," + getType() + "," + getName() + "," + getStatus() + "," + getDescription() + ","
+                + getEpic().getId() + "," + getStartTime() + "," + getDuration() + "," + getEndTime();
     }
 
     @Override

@@ -1,22 +1,22 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Epic extends Task {
     private List<SubTask> subTasks;
+    LocalDateTime endTime;
 
     public Epic(String name, String description) {
         super(name, description);
         subTasks = new ArrayList<>();
-        setStatus(Status.NEW);
-    }
-
-    public Epic(String name, String description, Status status) {
-        super(name, description);
-        subTasks = new ArrayList<>();
-        this.setStatus(status);
+        setStatus(calculateEpicStatus());
+        refreshEpicStartTime();
+        endTime = getEndTime();
+        refreshEpicDuration();
     }
 
     @Override
@@ -63,22 +63,63 @@ public class Epic extends Task {
         if (getSubTasks().isEmpty()) {
             return Status.NEW;
         }
-
         for (SubTask task : getSubTasks()) {
             if (task.getStatus().equals(Status.DONE)) {
                 doneCounter++;
-            }else if(task.getStatus().equals(Status.NEW)){
+            } else if (task.getStatus().equals(Status.NEW)) {
                 newCounter++;
             }
         }
         if (doneCounter == getSubTasks().size()) {
             return Status.DONE;
-        } else if(newCounter == getSubTasks().size()){
+        } else if (newCounter == getSubTasks().size()) {
             return Status.NEW;
-        }else return Status.IN_PROGRESS;
+        } else return Status.IN_PROGRESS;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public void refreshEpicStartTime() {
+        LocalDateTime tempDateTime = null;
+        for (SubTask subTask : getSubTasks()) {
+
+            if (tempDateTime == null) {
+                tempDateTime = subTask.getStartTime();
+            } else if (subTask.getStartTime().isBefore(tempDateTime)) {
+                tempDateTime = subTask.getStartTime();
+            }
+        }
+        startTime = tempDateTime;
+    }
+
+    public void refreshEpicDuration() {
+        Duration tempDuration = Duration.ZERO;
+        for (SubTask subTask : getSubTasks()) {
+            tempDuration = tempDuration.plus(subTask.getDuration());
+        }
+        duration = tempDuration;
     }
 
     public List<SubTask> getSubtasks() {
         return subTasks;
+    }
+
+    public void refreshEndTime() {
+        endTime = getEndTime();
+    }
+
+    @Override
+    LocalDateTime getEndTime() {
+        LocalDateTime tempEndTime = null;
+        for (SubTask subTask : subTasks) {
+            if (tempEndTime == null) {
+                tempEndTime = subTask.getEndTime();
+            } else if (tempEndTime.isBefore(subTask.getEndTime())) {
+                tempEndTime = subTask.getEndTime();
+            }
+        }
+        return tempEndTime;
     }
 }

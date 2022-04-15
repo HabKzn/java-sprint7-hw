@@ -4,6 +4,9 @@ import manager.InMemoryTaskManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EpicTest {
@@ -13,14 +16,14 @@ class EpicTest {
     static Epic epc4 = new Epic("epc4", "this is epic4");
     static Epic epc5 = new Epic("epc5", "this is epic5");
 
-    static SubTask sbt1 = new SubTask("sbt1", "this is subtask1", epc1);
-    static SubTask sbt2 = new SubTask("sbt2", "this is subtask2", epc1);
-    static SubTask sbt3 = new SubTask("sbt3", "this is subtask3", Status.DONE, epc2);
-    static SubTask sbt4 = new SubTask("sbt4", "this is subtask4", Status.DONE, epc2);
-    static SubTask sbt5 = new SubTask("sbt5", "this is subtask5", Status.IN_PROGRESS, epc4);
-    static SubTask sbt6 = new SubTask("sbt6", "this is subtask6", Status.IN_PROGRESS, epc4);
-    static SubTask sbt7 = new SubTask("sbt7", "this is subtask7", Status.NEW, epc5);
-    static SubTask sbt8 = new SubTask("sbt8", "this is subtask8", Status.DONE, epc5);
+    static SubTask sbt1 = new SubTask("sbt1", "this is subtask1", epc1,   LocalDateTime.of(2022, 4,17, 11, 0), Duration.ofMinutes(60));
+    static SubTask sbt2 = new SubTask("sbt2", "this is subtask2", epc1,   LocalDateTime.of(2022, 4,17, 12, 0), Duration.ofMinutes(60));
+    static SubTask sbt3 = new SubTask("sbt3", "this is subtask3", epc2, LocalDateTime.of(2022, 4,17, 12, 0), Duration.ofMinutes(60));
+    static SubTask sbt4 = new SubTask("sbt4", "this is subtask4", epc2, LocalDateTime.of(2022, 4,17, 12, 0), Duration.ofMinutes(60));
+    static SubTask sbt5 = new SubTask("sbt5", "this is subtask5", epc4, LocalDateTime.of(2022, 4,17, 12, 0), Duration.ofMinutes(60));
+    static SubTask sbt6 = new SubTask("sbt6", "this is subtask6", epc4, LocalDateTime.of(2022, 4,17, 12, 0), Duration.ofMinutes(60));
+    static SubTask sbt7 = new SubTask("sbt7", "this is subtask7", epc5, LocalDateTime.of(2022, 4,17, 12, 0), Duration.ofMinutes(60));
+    static SubTask sbt8 = new SubTask("sbt8", "this is subtask8", epc5, LocalDateTime.of(2022, 4,17, 12, 0), Duration.ofMinutes(60));
 
 
     static InMemoryTaskManager manager = new InMemoryTaskManager();

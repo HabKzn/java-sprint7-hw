@@ -111,6 +111,8 @@ public class InMemoryTaskManager implements TaskManager {
         subtask.setStatus(subtask.getStatus());
         epic.addSubTaskToEpicList(subtask);
         epic.setStatus(epic.calculateEpicStatus());
+        epic.refreshEpicStartTime();
+        epic.refreshEpicDuration();
 
     }
 
@@ -140,6 +142,9 @@ public class InMemoryTaskManager implements TaskManager {
         if (subTasks.containsKey(subtask.getId())) {
             subTasks.put(subtask.getId(), subtask);
             subtask.getEpic().setStatus(subtask.getEpic().calculateEpicStatus());
+            subtask.getEpic().refreshEpicStartTime();
+            subtask.getEpic().refreshEpicDuration();
+
         }
     }
 

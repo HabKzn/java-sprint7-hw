@@ -10,6 +10,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Date;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,10 +28,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     public static void main(String[] args)  {
         Epic epc1 = new Epic("epc1", "this is epic N1");
         Epic epc2 = new Epic("epc2", "this is epic N2");
-        SubTask sbt1 = new SubTask("sbt1", "this is subtask1", epc1);
-        SubTask sbt2 = new SubTask("sbt2", "this is subtask2", epc1);
-        SubTask sbt3 = new SubTask("sbt3", "this is subtask3", epc2);
-        SubTask sbt4 = new SubTask("sbt4", "this is subtask4", epc2);
+        SubTask sbt1 = new SubTask("sbt1", "this is subtask1", epc1, LocalDateTime.of(2022,4,16,10,0), Duration.ofMinutes(60));
+        SubTask sbt2 = new SubTask("sbt2", "this is subtask2", epc1,LocalDateTime.of(2022,4,16,11,0), Duration.ofMinutes(60));
+        SubTask sbt3 = new SubTask("sbt3", "this is subtask3", epc2,LocalDateTime.of(2022, 4,16,12,0), Duration.ofMinutes(60));
+        SubTask sbt4 = new SubTask("sbt4", "this is subtask4", epc2,LocalDateTime.of(2022,4,16,13,0), Duration.ofMinutes(60));
 
         FileBackedTasksManager manager = new FileBackedTasksManager("memoryFile.csv");
 
@@ -50,7 +54,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String firstManager = manager.memoryManager.getTasks().toString();
         String secondManager = newManager.memoryManager.getTasks().toString();
         System.out.println(firstManager.equals(secondManager));
-
+        System.out.println("1");
     }
 
     static FileBackedTasksManager loadFromFile(File file) {
@@ -58,21 +62,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         FileBackedTasksManager manager;
         try {
             listOfStrings = new ArrayList<>(Files.readAllLines(Paths.get(file.getName())));
-            Task task;
             manager = new FileBackedTasksManager(file.getPath());
 
             for (int i = 1; i < listOfStrings.size() - 2; i++) {
-                task = manager.fromString(listOfStrings.get(i));
+               Task task = manager.fromString(listOfStrings.get(i));
                 if (task instanceof Epic) {
-                    manager.epics.put(task.getId(), (Epic) task);
+                  manager.createEpic((Epic)task);
                 }
             }
             for (int i = 1; i < listOfStrings.size() - 2; i++) {
-                task = manager.fromString(listOfStrings.get(i));
+                Task task = manager.fromString(listOfStrings.get(i));
                 if (task instanceof SubTask) {
-                    manager.subTasks.put(task.getId(), (SubTask) task);
+                    SubTask st = (SubTask)task;
+                    manager.createSubTask(st, st.getEpic());
                 } else if (task != null && !(task instanceof Epic)) {
-                    manager.tasks.put(task.getId(), task);
+                    manager.createTask(task);
                 }
             }
         } catch (IOException e) {
@@ -84,14 +88,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             int historyElement = Integer.parseInt(tempHistory[i]);
             manager.memoryManager.add(manager.getTaskUniversal(historyElement));
         }
-
         manager.setUin(manager.epics.size() + manager.tasks.size() + manager.subTasks.size());
-        return manager;
+       return manager;
     }
 
     public void save() {
         try (PrintWriter pw = new PrintWriter(file.getName())) {
-            pw.println("id,type,name,status,description,epic");
+            pw.println("id,type,name,status,description,epic,startTime,duration,endTime");
             for (Task task : getAllTasksList()) {
                 pw.println(task.toString());
             }
@@ -207,21 +210,32 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     Task fromString(String value) {
         String[] temp = value.split(",");
-        Task task;
+
         switch (temp[1]) {
             case "SUBTASK":
-                task = new SubTask(temp[2], temp[4], Status.valueOf(temp[3]), epics.get(Integer.parseInt(temp[5])));
-                break;
+              SubTask  subTask = new SubTask(temp[2], temp[4], epics.get(Integer.parseInt(temp[5])), LocalDateTime.parse(temp[6]),  Duration.parse(temp[7]));
+               subTask.setStatus(Status.valueOf(temp[3]));
+              subTask.setUin(Integer.parseInt(temp[0]));
+               return subTask;
             case "EPIC":
-                task = new Epic((temp[2]), temp[4], Status.valueOf(temp[3]));
-                break;
+              Epic epic = new Epic((temp[2]), temp[4] );
+                epic.setStartTime(LocalDateTime.parse(temp[5]));
+                epic.setDuration(Duration.parse(temp[6]));
+                epic.setStatus(Status.valueOf(temp[3]));
+                 epic.setEndTime(LocalDateTime.parse(temp[7]));
+                 epic.setUin(Integer.parseInt(temp[0]));
+                 return epic;
+
             case "TASK":
-                task = new Task(temp[2], temp[4], Status.valueOf(temp[3]));
-                break;
+                Task task = new Task(temp[2], temp[4],LocalDateTime.parse(temp[5]), Duration.parse(temp[6]));
+                task.setStatus(Status.valueOf(temp[3]));
+               task.setUin(Integer.parseInt(temp[0]));
+                return task;
+
             default:
                 return null;
         }
-        task.setUin(Integer.parseInt(temp[0]));
-        return task;
+
+
     }
 }

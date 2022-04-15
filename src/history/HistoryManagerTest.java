@@ -7,6 +7,9 @@ import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 class HistoryManagerTest {
     Task task;
     Epic epic;
@@ -17,11 +20,11 @@ class HistoryManagerTest {
     @BeforeEach
     void createManager () {
       manager = new InMemoryHistoryManager();
-         task = new Task("name", "description");
+         task = new Task("name", "description", LocalDateTime.of(2022,04,16,10,0), Duration.ofMinutes(50));
         task.setUin(1);
        epic = new Epic("epicName", "epicDescription");
         epic.setUin(2);
-       subTask = new SubTask("subTaskName", "subTaskDescription", epic);
+       subTask = new SubTask("subTaskName", "subTaskDescription", epic, LocalDateTime.of(2022,4,16,10,50), Duration.ofMinutes(50));
         subTask.setUin(3);
     }
 
@@ -100,5 +103,4 @@ class HistoryManagerTest {
         manager.add(task);
         Assertions.assertEquals(manager.getSize(), 3);
     }
-
 }

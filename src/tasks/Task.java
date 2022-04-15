@@ -1,5 +1,8 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Task {
@@ -7,7 +10,29 @@ public class Task {
     private String description;
     private int uin;
     private Status status;
+    Duration duration;
+    LocalDateTime startTime;
 
+    public Task(final String name, final String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public Task(String name, String description, LocalDateTime startTime, Duration duration) {
+        this.name = name;
+        this.description = description;
+        this.startTime = startTime;
+        this.duration = duration;
+        setStatus(Status.NEW);
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
     public String getName() {
         return name;
     }
@@ -36,18 +61,6 @@ public class Task {
         return Types.TASK;
     }
 
-    public Task(String name, String description) {
-        this.name = name;
-        this.description = description;
-        status = Status.NEW;
-    }
-
-    public Task(String name, String description, Status status) {
-        this.name = name;
-        this.description = description;
-        this.status = status;
-    }
-
     public int getId() {
         return uin;
     }
@@ -62,7 +75,23 @@ public class Task {
 
     @Override
     public String toString() {
-        return getId() + "," + getType() + "," + getName() + "," + getStatus() + "," + getDescription();
+        return getId() + "," + getType() + "," + getName() + "," + getStatus() + "," + getDescription() +
+                "," + getStartTime() + "," + getDuration() + "," + getEndTime();
+    }
+
+    LocalDateTime getEndTime() {
+       if(startTime == null){
+           return null;
+       }
+        return startTime.plus(duration);
+    }
+
+    public void setDuration(final Duration duration) {
+        this.duration = duration;
+    }
+
+    public void setStartTime(final LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 
     @Override
