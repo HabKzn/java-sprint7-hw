@@ -6,9 +6,8 @@ import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private int uin;
@@ -16,6 +15,7 @@ public class InMemoryTaskManager implements TaskManager {
     public final HashMap<Integer, Epic> epics;
     public final HashMap<Integer, SubTask> subTasks;
     public final HistoryManager memoryManager;
+    Set<Task> treeSet;
 
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
@@ -24,6 +24,20 @@ public class InMemoryTaskManager implements TaskManager {
         uin = 0;
         memoryManager = Managers.getDefaultHistory();
 
+        Comparator<Task> taskComparator = new Comparator<Task>() {
+            @Override
+            public int compare(final Task o1, final Task o2) {
+                if (o1.getStartTime() == null && o2.getStartTime() == null) {
+                    return 0;
+                } else if (o1.getStartTime() == null) {
+                    return -1;
+                } else if (o2.getStartTime() == null) {
+                    return 1;
+                } else
+                    return o1.getStartTime().compareTo(o2.getStartTime());
+            }
+        };
+        treeSet = new TreeSet<>(taskComparator);
     }
 
     public int getUin() {
@@ -53,6 +67,9 @@ public class InMemoryTaskManager implements TaskManager {
     //удаление всех задач
     @Override
     public void clearTasks() {
+        for (Task task : tasks.values()) {
+            treeSet.remove(task);
+        }
         tasks.clear();
     }
 
@@ -64,6 +81,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearSubTasks() {
+        for (SubTask subTask : subTasks.values()) {
+            treeSet.remove(subTask);
+        }
         subTasks.clear();
         epics.clear();
     }
@@ -98,20 +118,32 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public void createTask(Task task) {
-        uin += 1;
-        tasks.put(uin, task);
-        task.setUin(uin);
-        task.setStatus(Status.NEW);
+        try {
+            validateTask(task);
+            uin += 1;
+            tasks.put(uin, task);
+            task.setUin(uin);
+            task.setStatus(Status.NEW);
+            treeSet.add(task);
+        } catch (TasksCrossException e) {
+            e.printStackTrace();
+        }
     }
 
     public void createSubTask(SubTask subtask, Epic epic) {
-        uin += 1;
-        subTasks.put(uin, subtask);
-        subtask.setUin(uin);
-        epic.addSubTaskToEpicList(subtask);
-        epic.setStatus(epic.calculateEpicStatus());
-        epic.refreshEpicStartTime();
-        epic.refreshEpicDuration();
+        try {
+            validateTask(subtask);
+            uin += 1;
+            subTasks.put(uin, subtask);
+            subtask.setUin(uin);
+            epic.addSubTaskToEpicList(subtask);
+            epic.setStatus(epic.calculateEpicStatus());
+            epic.refreshEpicStartTime();
+            epic.refreshEpicDuration();
+            treeSet.add(subtask);
+        } catch (TasksCrossException e) {
+            e.printStackTrace();
+        }
     }
 
     public void createEpic(Epic epic) {
@@ -132,6 +164,8 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
             tasks.put(task.getId(), task);
+            treeSet.remove(tasks.get(task.getId()));
+            treeSet.add(task);
         }
     }
 
@@ -142,7 +176,8 @@ public class InMemoryTaskManager implements TaskManager {
             subtask.getEpic().setStatus(subtask.getEpic().calculateEpicStatus());
             subtask.getEpic().refreshEpicStartTime();
             subtask.getEpic().refreshEpicDuration();
-
+            treeSet.remove(subTasks.get(subtask.getId()));
+            treeSet.add(subtask);
         }
     }
 
@@ -150,25 +185,30 @@ public class InMemoryTaskManager implements TaskManager {
     //Методы для удаления по ID(Вместе с эпиком удаляются и подзадачи)
     @Override
     public void deleteEpicById(int id) {
-       if (epics.containsKey(id)){
-        for (SubTask subtask : epics.get(id).getSubTasks()) {
-            subTasks.remove(subtask.getId());
-            removeFromHistoryByID(subtask.getId());
+        if (epics.containsKey(id)) {
+            for (SubTask subtask : epics.get(id).getSubTasks()) {
+                treeSet.remove(subTasks.get(subtask.getId()));
+                subTasks.remove(subtask.getId());
+                removeFromHistoryByID(subtask.getId());
+            }
+            epics.remove(id);
+            removeFromHistoryByID(id);
         }
-        epics.remove(id);
-        removeFromHistoryByID(id);}
     }
 
     @Override
     public void deleteTaskById(int id) {
-        if(tasks.containsKey(id))
-        {tasks.remove(id);
-        removeFromHistoryByID(id);}
+        if (tasks.containsKey(id)) {
+            treeSet.remove(tasks.get(id));
+            tasks.remove(id);
+            removeFromHistoryByID(id);
+        }
     }
 
     @Override
     public void deleteSubTaskById(int id) {
         if(subTasks.containsKey(id)){
+            treeSet.remove(subTasks.get(id));
             subTasks.remove(id);
         removeFromHistoryByID(id);}
     }
@@ -185,7 +225,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
 
-   public Task getTaskUniversal(int id) {
+    public Task getTaskUniversal(int id) {
         if (epics.containsKey(id)) {
             return epics.get(id);
         } else if (tasks.containsKey(id)) {
@@ -193,6 +233,25 @@ public class InMemoryTaskManager implements TaskManager {
         } else return subTasks.getOrDefault(id, null);
     }
 
+    void validateTask(Task task) throws TasksCrossException {
+        LocalDateTime taskStartTime = task.getStartTime();
+        LocalDateTime taskEndTime = task.getEndTime();
+        List<Task> tempList = getPrioritizedTask();
+        if (!tempList.isEmpty()) {
+            for (Task tempTask : tempList) {
+                if (tempTask.getStartTime().isAfter(taskStartTime) && tempTask.getStartTime().isBefore(taskEndTime) ||
+                        tempTask.getEndTime().isAfter(taskStartTime) && tempTask.getEndTime().isBefore(taskEndTime)) {
+                    throw new TasksCrossException("Новая задача пересекается по времени с задачей " + tempTask.getName() +
+                            " c id " + tempTask.getId() + ". Создайте задачу с другим временем исполнения.");
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<Task> getPrioritizedTask() {
+        return new ArrayList<>(treeSet);
+    }
 }
 
 

@@ -111,7 +111,7 @@ public class Epic extends Task {
     }
 
     @Override
-    LocalDateTime getEndTime() {
+    public LocalDateTime getEndTime() {
         LocalDateTime tempEndTime = null;
         for (SubTask subTask : subTasks) {
             if (tempEndTime == null) {

@@ -79,6 +79,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void getAllEpicsListWhileEpicsArePresent() {
         assertEquals(filledManager.getAllEpicsList().size(), 2);
+        assertEquals(filledManager.getAllEpicsList().get(0).getId(),2);
+        assertEquals(filledManager.getAllEpicsList().get(1).getId(),5);
     }
 
     @Test
@@ -89,6 +91,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void getAllTasksListWhileTasksArePresent() {
         assertEquals(filledManager.getAllTasksList().size(), 1);
+        assertEquals(filledManager.getAllTasksList().get(0).getId(), 1);
     }
 
     @Test
@@ -99,6 +102,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void getAllSubTasksListWhileSubTasksArePresent() {
         assertEquals(filledManager.getAllSubTasksList().size(), 3);
+        assertEquals(filledManager.getAllSubTasksList().get(0).getId(), 3);
+        assertEquals(filledManager.getAllSubTasksList().get(1).getId(), 4);
+        assertEquals(filledManager.getAllSubTasksList().get(2).getId(), 6);
     }
 
     @Test
@@ -133,7 +139,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void getEpicByUinWithFilledTasksList() {
-
+       assertEquals(filledManager.getEpicByUin(2).toString(), epic1TestString);
+        assertEquals(filledManager.history().size(), 1);
     }
 
     @Test
@@ -163,7 +170,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void createTaskWithNotEmptyTaskList() {
-        Task task = new Task("newTaskName", "NewTaskDescription");
+        Task task = new Task("newTaskName", "NewTaskDescription",LocalDateTime.of(2022, 4, 16, 10, 0), Duration.ofMinutes(60));
         assertEquals(1, filledManager.getAllTasksList().size());
         filledManager.createTask(task);
         assertEquals(2, filledManager.getAllTasksList().size());

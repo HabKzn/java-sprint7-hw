@@ -49,4 +49,6 @@ public interface TaskManager {
     void removeFromHistoryByID(int id);
 
     Task getTaskUniversal(int id);
+
+    List<Task> getPrioritizedTask();
 }

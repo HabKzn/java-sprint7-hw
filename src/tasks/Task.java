@@ -79,7 +79,7 @@ public class Task {
                 "," + getStartTime() + "," + getDuration() + "," + getEndTime();
     }
 
-    LocalDateTime getEndTime() {
+   public LocalDateTime getEndTime() {
        if(startTime == null){
            return null;
        }

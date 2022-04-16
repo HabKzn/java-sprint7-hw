@@ -31,8 +31,9 @@ class HistoryManagerTest {
     @Test
     void addWhileHistoryEmpty() {
       Assertions.assertEquals(manager.getSize(), 0);
-       manager.add(task);
+       manager.add(epic);
        Assertions.assertEquals(manager.getSize(), 1);
+       Assertions.assertEquals(manager.getTasks().get(0).getId(), 2);
     }
 
     @Test

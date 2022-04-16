@@ -10,10 +10,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Date;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +60,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String firstManager = manager.memoryManager.getTasks().toString();
         String secondManager = newManager.memoryManager.getTasks().toString();
         System.out.println(firstManager.equals(secondManager));
-        System.out.println("1");
+        System.out.println(manager.getPrioritizedTask());
     }
 
     static FileBackedTasksManager loadFromFile(File file) {

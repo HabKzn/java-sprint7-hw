@@ -5,14 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Status;
-import tasks.SubTask;
-import tasks.Task;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -37,7 +33,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
     @Test
     void saveWhileEmptyTasksList() throws IOException {
         emptyManager.save();
-        //При пустом списке задач все-равно создается строка с заглавием + пустая строка, поэтому разммер 2
+        //При пустом списке задач все-равно создается строка с заглавием + пустая строка, поэтому размер 2
         Assertions.assertEquals(Files.readAllLines(Paths.get("tests.csv")).size(), 2);
     }
 
@@ -51,11 +47,37 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
 
     @Test
     void saveContainsFilledHistory() throws IOException {
-        //Оба теста выше содержат пустой список просмотров, поэтому третьим тестом я сделаю сохранение с заполненным
-        // списком просмотров
         emptyManager.createEpic(epic1);
         emptyManager.getEpicByUin(1);
         emptyManager.save();
         Assertions.assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(3), "1");
+    }
+
+    @Test
+    void justSaveFilledManager() throws IOException {
+        filledManager.getTaskByUin(1);
+        filledManager.getSubTaskByUin(3);
+        filledManager.getEpicByUin(2);
+        filledManager.save();
+        assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(1),
+                "1,TASK,name,NEW,description,2022-04-17T10:00,PT50M,2022-04-17T10:50");
+
+        assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(2),
+                "3,SUBTASK,subTask11Name,NEW,subTask11Description,2,2022-04-16T10:00,PT1H,2022-04-16T11:00");
+
+        assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(3),
+                "4,SUBTASK,subTask12Name,NEW,subTask12Description,2,2022-04-16T11:00,PT1H,2022-04-16T12:00");
+
+        assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(4),
+                "6,SUBTASK,subTask21Name,DONE,subTask21Description,5,2022-04-16T13:00,PT1H,2022-04-16T14:00");
+
+        assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(5),
+                "2,EPIC,epic1Name,NEW,epic1Description,2022-04-16T10:00,PT2H,2022-04-16T12:00");
+
+        assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(6),
+                "5,EPIC,epic2Name,DONE,epic2Description,2022-04-16T13:00,PT1H,2022-04-16T14:00");
+
+        assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(8), "1,3,2");
+
     }
 }
