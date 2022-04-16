@@ -59,8 +59,9 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         filledManager.getSubTaskByUin(3);
         filledManager.getEpicByUin(2);
         filledManager.save();
+
         assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(1),
-                "1,TASK,name,NEW,description,2022-04-17T10:00,PT50M,2022-04-17T10:50");
+                "1,TASK,name,NEW,description,2022-04-17T09:00,PT50M,2022-04-17T09:50");
 
         assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(2),
                 "3,SUBTASK,subTask11Name,NEW,subTask11Description,2,2022-04-16T10:00,PT1H,2022-04-16T11:00");

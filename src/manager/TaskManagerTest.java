@@ -16,7 +16,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     T emptyManager;
     T filledManager;
     Task task = new Task("name", "description",
-            LocalDateTime.of(2022, 4, 17, 10, 0), Duration.ofMinutes(50));
+            LocalDateTime.of(2022, 4, 17, 9, 0), Duration.ofMinutes(50));
 
     Epic epic1 = new Epic("epic1Name", "epic1Description");
 
@@ -32,7 +32,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
             LocalDateTime.of(2022, 4, 16, 13, 0), Duration.ofMinutes(60));
 
 
-    String taskTestString = "1,TASK,name,NEW,description,2022-04-17T10:00,PT50M,2022-04-17T10:50";
+    String taskTestString = "1,TASK,name,NEW,description,2022-04-17T09:00,PT50M,2022-04-17T09:50";
     String epic1TestString = "2,EPIC,epic1Name,NEW,epic1Description,2022-04-16T10:00,PT2H,2022-04-16T12:00";
     String subTask11TestString = "3,SUBTASK,subTask11Name,NEW,subTask11Description,2,2022-04-16T10:00,PT1H,2022-04-16T11:00";
     String subTask12TestString = "4,SUBTASK,subTask12Name,NEW,subTask12Description,2,2022-04-16T11:00,PT1H,2022-04-16T12:00";
@@ -170,7 +170,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void createTaskWithNotEmptyTaskList() {
-        Task task = new Task("newTaskName", "NewTaskDescription",LocalDateTime.of(2022, 4, 16, 10, 0), Duration.ofMinutes(60));
+        Task task = new Task("newTaskName", "NewTaskDescription",LocalDateTime.of(2022, 4, 19, 10, 0), Duration.ofMinutes(60));
         assertEquals(1, filledManager.getAllTasksList().size());
         filledManager.createTask(task);
         assertEquals(2, filledManager.getAllTasksList().size());
@@ -265,7 +265,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void updateTaskIfListNotEmpty() {
         assertEquals(filledManager.getTaskUniversal(3).getStatus(), Status.NEW);
         assertEquals(filledManager.getAllTasksList().size(), 1);
-        Task task = new Task("a", "b");
+        Task task = new Task("a", "b", LocalDateTime.of(2022,04,15,10,20), Duration.ofMinutes(60));
         task.setStatus(Status.DONE);
         task.setUin(1);
         filledManager.updateTask(task);
@@ -452,6 +452,21 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void getTaskUniversalIfWrongId() {
         assertNull(filledManager.getTaskUniversal(100500));
     }
+
+    @Test
+    void getPrioritizedMethodTestIfManagerIsEmpty() {
+        assertEquals(emptyManager.getPrioritizedTask().size(),0 );
+    }
+
+    @Test
+    void getPrioritizedMethodTestIfManagerIsNotEmpty() {
+        assertEquals(filledManager.getPrioritizedTask().size(),4 );
+        assertEquals(filledManager.getPrioritizedTask().get(0).toString(), subTask11TestString);
+        assertEquals(filledManager.getPrioritizedTask().get(3).toString(), taskTestString);
+    }
+
+
+
 
 }
 

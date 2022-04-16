@@ -61,6 +61,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String secondManager = newManager.memoryManager.getTasks().toString();
         System.out.println(firstManager.equals(secondManager));
         System.out.println(manager.getPrioritizedTask());
+        manager.createTask(sbt1);
     }
 
     static FileBackedTasksManager loadFromFile(File file) {
@@ -148,13 +149,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateTask(final Task task) {
+    public void updateTask( Task task) {
         super.updateTask(task);
         save();
     }
 
     @Override
-    public void updateSubTask(final SubTask subtask) {
+    public void updateSubTask( SubTask subtask) {
         super.updateSubTask(subtask);
         save();
     }

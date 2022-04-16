@@ -48,7 +48,7 @@ public class InMemoryTaskManager implements TaskManager {
         this.uin = uin;
     }
 
-    //получение списка всех задач по типу
+
     @Override
     public ArrayList<Epic> getAllEpicsList() {
         return new ArrayList<>(epics.values());
@@ -118,21 +118,19 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public void createTask(Task task) {
-        try {
-            validateTask(task);
+
+        if (taskIsValid(task)) {
             uin += 1;
             tasks.put(uin, task);
             task.setUin(uin);
             task.setStatus(Status.NEW);
             treeSet.add(task);
-        } catch (TasksCrossException e) {
-            e.printStackTrace();
         }
     }
 
     public void createSubTask(SubTask subtask, Epic epic) {
-        try {
-            validateTask(subtask);
+
+        if (taskIsValid(subtask)) {
             uin += 1;
             subTasks.put(uin, subtask);
             subtask.setUin(uin);
@@ -141,8 +139,6 @@ public class InMemoryTaskManager implements TaskManager {
             epic.refreshEpicStartTime();
             epic.refreshEpicDuration();
             treeSet.add(subtask);
-        } catch (TasksCrossException e) {
-            e.printStackTrace();
         }
     }
 
@@ -162,23 +158,26 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     public void updateTask(Task task) {
+
         if (tasks.containsKey(task.getId())) {
-            tasks.put(task.getId(), task);
-            treeSet.remove(tasks.get(task.getId()));
-            treeSet.add(task);
+            Task oldTask = tasks.get(task.getId());
+            tasks.remove(oldTask.getId());
+            treeSet.remove(oldTask);
+            if (taskIsValid(task)) {
+                tasks.put(task.getId(), task);
+                treeSet.add(task);
+            } else {
+                tasks.put(oldTask.getId(), oldTask);
+                treeSet.add(oldTask);
+            }
         }
     }
 
-
     public void updateSubTask(SubTask subtask) {
         if (subTasks.containsKey(subtask.getId())) {
-            subTasks.put(subtask.getId(), subtask);
-            subtask.getEpic().setStatus(subtask.getEpic().calculateEpicStatus());
-            subtask.getEpic().refreshEpicStartTime();
-            subtask.getEpic().refreshEpicDuration();
-            treeSet.remove(subTasks.get(subtask.getId()));
-            treeSet.add(subtask);
-        }
+           subTasks.put(subtask.getId(),subtask);
+           subtask.getEpic().setStatus(subtask.getEpic().calculateEpicStatus());
+            }
     }
 
 
@@ -233,19 +232,26 @@ public class InMemoryTaskManager implements TaskManager {
         } else return subTasks.getOrDefault(id, null);
     }
 
-    void validateTask(Task task) throws TasksCrossException {
+    public boolean taskIsValid(Task task) {
         LocalDateTime taskStartTime = task.getStartTime();
         LocalDateTime taskEndTime = task.getEndTime();
         List<Task> tempList = getPrioritizedTask();
+
         if (!tempList.isEmpty()) {
             for (Task tempTask : tempList) {
-                if (tempTask.getStartTime().isAfter(taskStartTime) && tempTask.getStartTime().isBefore(taskEndTime) ||
-                        tempTask.getEndTime().isAfter(taskStartTime) && tempTask.getEndTime().isBefore(taskEndTime)) {
-                    throw new TasksCrossException("Новая задача пересекается по времени с задачей " + tempTask.getName() +
-                            " c id " + tempTask.getId() + ". Создайте задачу с другим временем исполнения.");
+                LocalDateTime tempTaskStartTime = tempTask.getStartTime();
+                LocalDateTime tempTaskEndTime = tempTask.getStartTime();
+                if (tempTaskStartTime.equals(taskStartTime) || tempTaskEndTime.equals(taskEndTime) ||
+                        ((tempTaskStartTime.isAfter(taskStartTime)) && (tempTaskStartTime.isBefore(taskEndTime))
+                                || tempTaskEndTime.isAfter(taskStartTime) && tempTaskEndTime.isBefore(taskEndTime))) {
+                    System.out.println("Новая задача не добавлена, так как пересекается по времени с задачей "
+                                       + tempTask.getName() + " c id " + tempTask.getId()
+                                       + ". Создайте задачу с другим временем исполнения.");
+                    return false;
                 }
             }
         }
+        return true;
     }
 
     @Override
