@@ -175,9 +175,18 @@ public class InMemoryTaskManager implements TaskManager {
 
     public void updateSubTask(SubTask subtask) {
         if (subTasks.containsKey(subtask.getId())) {
-           subTasks.put(subtask.getId(),subtask);
-           subtask.getEpic().setStatus(subtask.getEpic().calculateEpicStatus());
+            SubTask oldSubTask = subTasks.get(subtask.getId());
+            subTasks.remove(subtask.getId());
+
+            if (taskIsValid(subtask)) {
+                subTasks.put(subtask.getId(), subtask);
+                subtask.getEpic().setStatus(subtask.getEpic().calculateEpicStatus());
+                treeSet.remove(oldSubTask);
+                treeSet.add(subtask);
             }
+            subTasks.put(oldSubTask.getId(), oldSubTask);
+            oldSubTask.getEpic().setStatus(oldSubTask.getEpic().calculateEpicStatus());
+        }
     }
 
 
