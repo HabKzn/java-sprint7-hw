@@ -177,11 +177,11 @@ public class InMemoryTaskManager implements TaskManager {
         if (subTasks.containsKey(subtask.getId())) {
             SubTask oldSubTask = subTasks.get(subtask.getId());
             subTasks.remove(subtask.getId());
-
+            treeSet.remove(oldSubTask);
             if (taskIsValid(subtask)) {
                 subTasks.put(subtask.getId(), subtask);
                 subtask.getEpic().setStatus(subtask.getEpic().calculateEpicStatus());
-                treeSet.remove(oldSubTask);
+
                 treeSet.add(subtask);
             }
             subTasks.put(oldSubTask.getId(), oldSubTask);
@@ -253,7 +253,7 @@ public class InMemoryTaskManager implements TaskManager {
                 if (tempTaskStartTime.equals(taskStartTime) || tempTaskEndTime.equals(taskEndTime) ||
                         ((tempTaskStartTime.isAfter(taskStartTime)) && (tempTaskStartTime.isBefore(taskEndTime))
                                 || tempTaskEndTime.isAfter(taskStartTime) && tempTaskEndTime.isBefore(taskEndTime))) {
-                    System.out.println("Новая задача не добавлена, так как пересекается по времени с задачей "
+                    System.out.println("Новая задача "+ task.getName() +" не добавлена, так как пересекается по времени с задачей "
                                        + tempTask.getName() + " c id " + tempTask.getId()
                                        + ". Создайте задачу с другим временем исполнения.");
                     return false;

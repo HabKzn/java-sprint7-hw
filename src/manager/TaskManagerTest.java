@@ -15,6 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 abstract class TaskManagerTest<T extends TaskManager> {
     T emptyManager;
     T filledManager;
+
+
+
     Task task = new Task("name", "description",
             LocalDateTime.of(2022, 4, 17, 9, 0), Duration.ofMinutes(50));
 
@@ -30,6 +33,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     SubTask subTask21 = new SubTask("subTask21Name", "subTask21Description", epic2,
             LocalDateTime.of(2022, 4, 16, 13, 0), Duration.ofMinutes(60));
+
+
 
 
     String taskTestString = "1,TASK,name,NEW,description,2022-04-17T09:00,PT50M,2022-04-17T09:50";
@@ -440,7 +445,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
         System.out.println(filledManager.getTaskUniversal(3).toString());
         System.out.println(filledManager.getTaskUniversal(2).toString());
         System.out.println(filledManager.getTaskUniversal(1).toString());
-        System.out.println(1);
     }
 
     @Test
@@ -461,13 +465,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void getPrioritizedMethodTestIfManagerIsNotEmpty() {
         assertEquals(filledManager.getPrioritizedTask().size(),4 );
-        assertEquals(filledManager.getPrioritizedTask().get(0).toString(), subTask11TestString);
+       assertEquals(filledManager.getPrioritizedTask().get(0).toString(), subTask11TestString);
         assertEquals(filledManager.getPrioritizedTask().get(3).toString(), taskTestString);
     }
-
-
-
-
 }
 
 
