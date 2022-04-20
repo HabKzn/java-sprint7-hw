@@ -1,5 +1,7 @@
-package history;
+package tests;
 
+import history.HistoryManager;
+import history.InMemoryHistoryManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,26 +16,26 @@ class HistoryManagerTest {
     Task task;
     Epic epic;
     SubTask subTask;
-   HistoryManager manager;
+    HistoryManager manager;
 
 
     @BeforeEach
     void createManager () {
-      manager = new InMemoryHistoryManager();
-         task = new Task("name", "description", LocalDateTime.of(2022,04,16,10,0), Duration.ofMinutes(50));
+        manager = new InMemoryHistoryManager();
+        task = new Task("name", "description", LocalDateTime.of(2022,04,16,10,0), Duration.ofMinutes(50));
         task.setUin(1);
-       epic = new Epic("epicName", "epicDescription");
+        epic = new Epic("epicName", "epicDescription");
         epic.setUin(2);
-       subTask = new SubTask("subTaskName", "subTaskDescription", epic, LocalDateTime.of(2022,4,16,10,50), Duration.ofMinutes(50));
+        subTask = new SubTask("subTaskName", "subTaskDescription", epic, LocalDateTime.of(2022,4,16,10,50), Duration.ofMinutes(50));
         subTask.setUin(3);
     }
 
     @Test
     void addWhileHistoryEmpty() {
-      Assertions.assertEquals(manager.getSize(), 0);
-       manager.add(epic);
-       Assertions.assertEquals(manager.getSize(), 1);
-       Assertions.assertEquals(manager.getTasks().get(0).getId(), 2);
+        Assertions.assertEquals(manager.getSize(), 0);
+        manager.add(epic);
+        Assertions.assertEquals(manager.getSize(), 1);
+        Assertions.assertEquals(manager.getTasks().get(0).getId(), 2);
     }
 
     @Test
@@ -66,6 +68,16 @@ class HistoryManagerTest {
     }
 
     @Test
+    void removeNonExistent(){
+        manager.add(epic);
+        manager.add(subTask);
+        manager.add(task);
+        Assertions.assertEquals(manager.getSize(), 3);
+        manager.remove(100500);
+        Assertions.assertEquals(manager.getSize(), 3);
+    }
+
+    @Test
     void removeLast() {
         manager.add(epic);
         manager.add(subTask);
@@ -84,7 +96,6 @@ class HistoryManagerTest {
         Assertions.assertEquals(manager.getTasks().get(0), epic);
         Assertions.assertEquals(manager.getTasks().get(1), subTask);
         Assertions.assertEquals(manager.getTasks().get(2), task);
-
     }
 
     @Test

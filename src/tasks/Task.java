@@ -9,8 +9,8 @@ public class Task {
     private String description;
     private int uin;
     private Status status;
-    Duration duration;
-    LocalDateTime startTime;
+    private Duration duration;
+    private LocalDateTime startTime;
 
     public Task(final String name, final String description) {
         this.name = name;
@@ -32,6 +32,7 @@ public class Task {
     public LocalDateTime getStartTime() {
         return startTime;
     }
+
     public String getName() {
         return name;
     }
@@ -79,10 +80,7 @@ public class Task {
                 "," + getStartTime() + "," + getDuration() + "," + getEndTime();
     }
 
-   public LocalDateTime getEndTime() {
-       if(startTime == null){
-           return null;
-       }
+    public LocalDateTime getEndTime() {
         return startTime.plus(duration);
     }
 
@@ -106,4 +104,5 @@ public class Task {
     public int hashCode() {
         return Objects.hash(getName(), getDescription(), getUin(), getStatus());
     }
+
 }

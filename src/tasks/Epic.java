@@ -7,16 +7,14 @@ import java.util.List;
 import java.util.Objects;
 
 public class Epic extends Task {
-    public List<SubTask> subTasks;
-    LocalDateTime endTime;
+    private List<SubTask> subTasks;
+    private LocalDateTime endTime;
 
     public Epic(String name, String description) {
         super(name, description);
         subTasks = new ArrayList<>();
-        setStatus(calculateEpicStatus());
-        refreshEpicStartTime();
+       refreshEpicData();
         endTime = getEndTime();
-        refreshEpicDuration();
     }
 
     @Override
@@ -52,27 +50,6 @@ public class Epic extends Task {
         return Objects.hash(super.hashCode(), getSubTasks());
     }
 
-    public Status calculateEpicStatus() {
-        int doneCounter = 0;
-        int newCounter = 0;
-
-        if (getSubTasks().isEmpty()) {
-            return Status.NEW;
-        }
-        for (SubTask task : getSubTasks()) {
-            if (task.getStatus().equals(Status.DONE)) {
-                doneCounter++;
-            } else if (task.getStatus().equals(Status.NEW)) {
-                newCounter++;
-            }
-        }
-        if (doneCounter == getSubTasks().size()) {
-            return Status.DONE;
-        } else if (newCounter == getSubTasks().size()) {
-            return Status.NEW;
-        } else return Status.IN_PROGRESS;
-    }
-
     public void addSubtask(SubTask subtask) {
         subTasks.add(subtask);
     }
@@ -81,25 +58,38 @@ public class Epic extends Task {
         this.endTime = endTime;
     }
 
-    public void refreshEpicStartTime() {
-        LocalDateTime tempDateTime = null;
-        for (SubTask subTask : getSubTasks()) {
+    // Как вы справедливо заметили, для оптимизации следовало заменить три метода, перебирающих список на один метод,
+    // который совершает все манипуляции за один проход. Что я и сделал, правда код стал сложнее для понимания.
 
-            if (tempDateTime == null) {
-                tempDateTime = subTask.getStartTime();
-            } else if (subTask.getStartTime().isBefore(tempDateTime)) {
+
+    public void refreshEpicData() {
+
+        if(subTasks.size()>0){
+        LocalDateTime tempDateTime = subTasks.get(0).getStartTime();
+        Duration tempDuration = Duration.ZERO;
+        int doneCounter = 0;
+        int newCounter = 0;
+
+        for (SubTask subTask : getSubTasks()) {
+               if (subTask.getStartTime().isBefore(tempDateTime)) {
                 tempDateTime = subTask.getStartTime();
             }
-        }
-        startTime = tempDateTime;
-    }
-
-    public void refreshEpicDuration() {
-        Duration tempDuration = Duration.ZERO;
-        for (SubTask subTask : getSubTasks()) {
             tempDuration = tempDuration.plus(subTask.getDuration());
-        }
-        duration = tempDuration;
+
+            if (subTask.getStatus().equals(Status.DONE)) {
+                doneCounter++;
+            } else if (subTask.getStatus().equals(Status.NEW)) {
+                newCounter++;
+            }
+               }
+            if (doneCounter == getSubTasks().size()) {
+                setStatus(Status.DONE);
+            } else if (newCounter == getSubTasks().size()) {
+                setStatus(Status.NEW);
+            } else setStatus(Status.IN_PROGRESS);
+
+        setDuration(tempDuration);
+        setStartTime(tempDateTime);}
     }
 
     public List<SubTask> getSubtasks() {

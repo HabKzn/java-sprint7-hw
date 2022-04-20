@@ -60,8 +60,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String firstManager = manager.memoryManager.getTasks().toString();
         String secondManager = newManager.memoryManager.getTasks().toString();
         System.out.println(firstManager.equals(secondManager));
-        System.out.println(manager.getPrioritizedTask());
-        manager.createTask(sbt1);
+
     }
 
     static FileBackedTasksManager loadFromFile(File file) {
@@ -94,7 +93,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             int historyElement = Integer.parseInt(tempHistory[i]);
             manager.memoryManager.add(manager.getTaskUniversal(historyElement));
         }
-        manager.setUin(manager.epics.size() + manager.tasks.size() + manager.subTasks.size());
+        manager.setUin(manager.managerEpicsMap.size() + manager.managerTasksMap.size() + manager.managerSubTasksMap.size());
         manager.save();
        return manager;
     }
@@ -132,7 +131,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public void createSubTask(final SubTask subtask, final int epicId) {
-        super.createSubTask(subtask, epics.get(epicId));
+        super.createSubTask(subtask, managerEpicsMap.get(epicId));
         save();
     }
 
@@ -155,8 +154,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateSubTask( SubTask subtask) {
-        super.updateSubTask(subtask);
+    public void updateSubTask( SubTask newSubtask) {
+        super.updateSubTask(newSubtask);
         save();
     }
 
@@ -186,30 +185,30 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @Override
     public Epic getEpicByUin(int uin) {
-        if (epics.get(uin) != null) {
-            memoryManager.add(epics.get(uin));
+        if (managerEpicsMap.get(uin) != null) {
+            memoryManager.add(managerEpicsMap.get(uin));
             save();
-            return epics.get(uin);
+            return managerEpicsMap.get(uin);
         } else
             return null;
     }
 
     @Override
     public Task getTaskByUin(int uin) {
-        if (tasks.get(uin) != null) {
-            memoryManager.add(tasks.get(uin));
+        if (managerTasksMap.get(uin) != null) {
+            memoryManager.add(managerTasksMap.get(uin));
             save();
-            return tasks.get(uin);
+            return managerTasksMap.get(uin);
         } else
             return null;
     }
 
     @Override
     public Task getSubTaskByUin(int uin) {
-        if (subTasks.get(uin) != null) {
-            memoryManager.add(subTasks.get(uin));
+        if (managerSubTasksMap.get(uin) != null) {
+            memoryManager.add(managerSubTasksMap.get(uin));
             save();
-            return subTasks.get(uin);
+            return managerSubTasksMap.get(uin);
         } else
             return null;
     }
@@ -220,7 +219,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
         switch (temp[1]) {
             case "SUBTASK":
-              SubTask  subTask = new SubTask(temp[2], temp[4], epics.get(Integer.parseInt(temp[5])), LocalDateTime.parse(temp[6]),  Duration.parse(temp[7]));
+              SubTask  subTask = new SubTask(temp[2], temp[4], managerEpicsMap.get(Integer.parseInt(temp[5])), LocalDateTime.parse(temp[6]),  Duration.parse(temp[7]));
                subTask.setStatus(Status.valueOf(temp[3]));
               subTask.setUin(Integer.parseInt(temp[0]));
                return subTask;

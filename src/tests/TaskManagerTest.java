@@ -1,5 +1,7 @@
-package manager;
+package tests;
 
+import manager.TaskManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Status;
@@ -15,34 +17,39 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 abstract class TaskManagerTest<T extends TaskManager> {
     T emptyManager;
     T filledManager;
-
-
-
-    Task task = new Task("name", "description",
-            LocalDateTime.of(2022, 4, 17, 9, 0), Duration.ofMinutes(50));
-
-    Epic epic1 = new Epic("epic1Name", "epic1Description");
-
-    SubTask subTask11 = new SubTask("subTask11Name", "subTask11Description", epic1,
-            LocalDateTime.of(2022, 4, 16, 10, 0), Duration.ofMinutes(60));
-
-    SubTask subTask12 = new SubTask("subTask12Name", "subTask12Description", epic1,
-            LocalDateTime.of(2022, 4, 16, 11, 0), Duration.ofMinutes(60));
-
-    Epic epic2 = new Epic("epic2Name", "epic2Description");
-
-    SubTask subTask21 = new SubTask("subTask21Name", "subTask21Description", epic2,
-            LocalDateTime.of(2022, 4, 16, 13, 0), Duration.ofMinutes(60));
-
-
-
+    Task task;
+    Epic epic1;
+    SubTask subTask11;
+    SubTask subTask12;
+    Epic epic2;
+    SubTask subTask21;
 
     String taskTestString = "1,TASK,name,NEW,description,2022-04-17T09:00,PT50M,2022-04-17T09:50";
     String epic1TestString = "2,EPIC,epic1Name,NEW,epic1Description,2022-04-16T10:00,PT2H,2022-04-16T12:00";
     String subTask11TestString = "3,SUBTASK,subTask11Name,NEW,subTask11Description,2,2022-04-16T10:00,PT1H,2022-04-16T11:00";
     String subTask12TestString = "4,SUBTASK,subTask12Name,NEW,subTask12Description,2,2022-04-16T11:00,PT1H,2022-04-16T12:00";
-    String epic2TestString = "5,EPIC,epic2Name,DONE,epic2Description,2022-04-16T13:00,PT2H,2022-04-16T14:00";
-    String subTask21TestString = "6,SUBTASK,subTask21Name,DONE,subTask21Description,5,2022-04-16T13:00,PT1H,2022-04-16T14:00";
+
+    //Здравствуйте! Как бы я не старался, у меня не получилось заполнить менеджеры в этом классе.
+    // Все остальные ваши замечания я исправил. Так как это не строгое замечание, решил оставить так.
+
+    @BeforeEach
+    void createTasks() {
+        task = new Task("name", "description",
+                LocalDateTime.of(2022, 4, 17, 9, 0), Duration.ofMinutes(50));
+
+        epic1 = new Epic("epic1Name", "epic1Description");
+
+        subTask11 = new SubTask("subTask11Name", "subTask11Description", epic1,
+                LocalDateTime.of(2022, 4, 16, 10, 0), Duration.ofMinutes(60));
+
+        subTask12 = new SubTask("subTask12Name", "subTask12Description", epic1,
+                LocalDateTime.of(2022, 4, 16, 11, 0), Duration.ofMinutes(60));
+
+        epic2 = new Epic("epic2Name", "epic2Description");
+
+        subTask21 = new SubTask("subTask21Name", "subTask21Description", epic2,
+                LocalDateTime.of(2022, 4, 16, 13, 0), Duration.ofMinutes(60));
+    }
 
 
     @Test
@@ -84,8 +91,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void getAllEpicsListWhileEpicsArePresent() {
         assertEquals(filledManager.getAllEpicsList().size(), 2);
-        assertEquals(filledManager.getAllEpicsList().get(0).getId(),2);
-        assertEquals(filledManager.getAllEpicsList().get(1).getId(),5);
+        assertEquals(filledManager.getAllEpicsList().get(0).getId(), 2);
+        assertEquals(filledManager.getAllEpicsList().get(1).getId(), 5);
     }
 
     @Test
@@ -144,7 +151,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void getEpicByUinWithFilledTasksList() {
-       assertEquals(filledManager.getEpicByUin(2).toString(), epic1TestString);
+        assertEquals(filledManager.getEpicByUin(2).toString(), epic1TestString);
         assertEquals(filledManager.history().size(), 1);
     }
 
@@ -175,7 +182,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void createTaskWithNotEmptyTaskList() {
-        Task task = new Task("newTaskName", "NewTaskDescription",LocalDateTime.of(2022, 4, 19, 10, 0), Duration.ofMinutes(60));
+        Task task = new Task("newTaskName", "NewTaskDescription",
+                LocalDateTime.of(2022, 4, 19, 10, 0), Duration.ofMinutes(60));
         assertEquals(1, filledManager.getAllTasksList().size());
         filledManager.createTask(task);
         assertEquals(2, filledManager.getAllTasksList().size());
@@ -183,7 +191,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void createTaskWithEmptyTaskList() {
-        Task task = new Task("newTaskName", "NewTaskDescription");
+        Task task = new Task("newTaskName", "NewTaskDescription",
+                LocalDateTime.of(2032, 1, 12, 3, 44), Duration.ofMinutes(60));
         assertEquals(0, emptyManager.getAllTasksList().size());
         emptyManager.createTask(task);
         assertEquals(1, emptyManager.getAllTasksList().size());
@@ -192,9 +201,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void createSubTaskWithNotEmptyTaskList() {
         SubTask subtask = new SubTask("subtaskname", "subtaskdescription",
-                 (Epic) filledManager.getTaskUniversal(2),
-                 LocalDateTime.of(2022, 4,17, 11, 0),
-                 Duration.ofMinutes(40));
+                (Epic) filledManager.getTaskUniversal(2),
+                LocalDateTime.of(2022, 4, 17, 11, 0),
+                Duration.ofMinutes(40));
         assertEquals(3, filledManager.getAllSubTasksList().size());
         filledManager.createSubTask(subtask, subtask.getEpic());
         assertEquals(4, filledManager.getAllSubTasksList().size());
@@ -204,7 +213,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void createSubTaskWithEmptyTaskList() {
         Epic epic = new Epic("epicname", "epicdescription");
         SubTask subtask = new SubTask("subtaskname", "subtaskdescription", epic,
-                LocalDateTime.of(2022, 4,17, 11, 0), Duration.ofMinutes(40));
+                LocalDateTime.of(2022, 4, 17, 11, 0), Duration.ofMinutes(40));
         assertEquals(0, emptyManager.getAllSubTasksList().size());
         emptyManager.createSubTask(subtask, epic);
         assertEquals(1, emptyManager.getAllSubTasksList().size());
@@ -229,9 +238,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void updateEpicIfEpicListNotEmpty() {
         assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.NEW);
         assertEquals(filledManager.getAllEpicsList().size(), 2);
-        epic1.setStatus(Status.DONE);
-        filledManager.updateEpic(epic1);
-        assertEquals(filledManager.getTaskUniversal(2).getStatus(), Status.DONE);
+        Epic newEpic = cloneEpic(epic1);
+        newEpic.setDescription("newDescription");
+        filledManager.updateEpic(newEpic);
+        assertEquals(filledManager.getTaskUniversal(2).getDescription(), "newDescription");
         assertEquals(filledManager.getAllEpicsList().size(), 2);
     }
 
@@ -248,18 +258,19 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void updateSubtaskIfListNotEmpty() {
         assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.NEW);
         assertEquals(filledManager.getAllSubTasksList().size(), 3);
-        SubTask sbt = (SubTask) filledManager.getTaskUniversal(3);
+        SubTask oldSubTask = (SubTask) filledManager.getTaskUniversal(3);
+        SubTask sbt = cloneSubTask((SubTask) filledManager.getTaskUniversal(3));
         sbt.setStatus(Status.DONE);
         filledManager.updateSubTask(sbt);
         assertEquals(filledManager.getTaskUniversal(3).getStatus(), Status.DONE);
-       assertEquals(filledManager.getTaskUniversal(2).getStatus(), Status.IN_PROGRESS);
+        assertEquals(filledManager.getTaskUniversal(2).getStatus(), Status.IN_PROGRESS);
         assertEquals(filledManager.getAllSubTasksList().size(), 3);
     }
 
     @Test
     void updateSubtaskIfListIsEmpty() {
         SubTask subtask = new SubTask("name", "Surname", new Epic("name", "Surname"),
-                LocalDateTime.of(2022, 4,17, 11, 0), Duration.ofMinutes(40));
+                LocalDateTime.of(2022, 4, 17, 11, 0), Duration.ofMinutes(40));
         subtask.setStatus(Status.DONE);
         emptyManager.updateSubTask(subtask);
         assertNull(emptyManager.getTaskUniversal(subtask.getId()));
@@ -270,9 +281,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void updateTaskIfListNotEmpty() {
         assertEquals(filledManager.getTaskUniversal(3).getStatus(), Status.NEW);
         assertEquals(filledManager.getAllTasksList().size(), 1);
-        Task task = new Task("a", "b", LocalDateTime.of(2022,04,15,10,20), Duration.ofMinutes(60));
+        Task task = cloneTask(filledManager.getTaskUniversal(1));
         task.setStatus(Status.DONE);
-        task.setUin(1);
         filledManager.updateTask(task);
         assertEquals(filledManager.getTaskUniversal(1).getStatus(), Status.DONE);
         assertEquals(filledManager.getAllTasksList().size(), 1);
@@ -441,10 +451,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void getTaskUniversalIfTaskListsNotEmpty() {
-        System.out.println(filledManager.getTaskUniversal(4).toString());
-        System.out.println(filledManager.getTaskUniversal(3).toString());
-        System.out.println(filledManager.getTaskUniversal(2).toString());
-        System.out.println(filledManager.getTaskUniversal(1).toString());
+        assertEquals(filledManager.getTaskUniversal(4).toString(), subTask12TestString);
+        assertEquals(filledManager.getTaskUniversal(3).toString(), subTask11TestString);
+        assertEquals(filledManager.getTaskUniversal(2).toString(), epic1TestString);
+        assertEquals(filledManager.getTaskUniversal(1).toString(), taskTestString);
     }
 
     @Test
@@ -459,14 +469,75 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void getPrioritizedMethodTestIfManagerIsEmpty() {
-        assertEquals(emptyManager.getPrioritizedTask().size(),0 );
+        assertEquals(emptyManager.getPrioritizedTask().size(), 0);
     }
 
     @Test
     void getPrioritizedMethodTestIfManagerIsNotEmpty() {
-        assertEquals(filledManager.getPrioritizedTask().size(),4 );
-       assertEquals(filledManager.getPrioritizedTask().get(0).toString(), subTask11TestString);
+        assertEquals(filledManager.getPrioritizedTask().size(), 4);
+        assertEquals(filledManager.getPrioritizedTask().get(0).toString(), subTask11TestString);
         assertEquals(filledManager.getPrioritizedTask().get(3).toString(), taskTestString);
+    }
+
+    @Test
+    void changeStartTimeOfTaskTestToFreeTimed() {
+        Task task = cloneTask(filledManager.getTaskUniversal(1));
+        task.setStartTime(LocalDateTime.of(2000, 04, 17, 6, 0));
+        filledManager.updateTask(task);
+        assertEquals("2000-04-17T06:00", filledManager.getTaskUniversal(1).getStartTime().toString());
+    }
+
+    @Test
+    void changeStartTimeOfTaskTestToOccupiedTime() {
+        Task oldTask = cloneTask(filledManager.getTaskUniversal(1));
+        Task changedTask = cloneTask(oldTask);
+        changedTask.setStartTime(LocalDateTime.of(2022, 04, 16, 10, 30));
+        filledManager.updateTask(changedTask);
+        assertEquals("2022-04-17T09:00", filledManager.getTaskUniversal(1).getStartTime().toString());
+    }
+
+    @Test
+    void changeStartTimeOfSubTaskTestToFreeTime() {
+        SubTask subTask = cloneSubTask((SubTask) filledManager.getTaskUniversal(3));
+        subTask.setStartTime(LocalDateTime.of(2025, 04, 16, 13, 30));
+        filledManager.updateSubTask(subTask);
+        assertEquals("2025-04-16T13:30", filledManager.getTaskUniversal(3).getStartTime().toString());
+        assertEquals("2025-04-16T14:30", filledManager.getTaskUniversal(2).getEndTime().toString());
+    }
+
+    @Test
+    void changeStartTimeOfSubTaskTestToOccupiedTime() {
+        SubTask subTask = cloneSubTask((SubTask) filledManager.getTaskUniversal(3));
+        subTask.setStartTime(LocalDateTime.of(2022, 4, 16, 13, 30));
+        filledManager.updateTask(subTask);
+        assertEquals("2022-04-16T10:00", filledManager.getTaskUniversal(3).getStartTime().toString());
+        assertEquals("2022-04-16T10:00", filledManager.getTaskUniversal(2).getStartTime().toString());
+    }
+
+    //    служебные методы для некоторых тестов:
+    public SubTask cloneSubTask(SubTask subTask) {
+        SubTask newSubTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getEpic(), subTask.getStartTime(), subTask.getDuration());
+        newSubTask.setUin(subTask.getId());
+        newSubTask.setStatus(subTask.getStatus());
+        return newSubTask;
+    }
+
+    public Task cloneTask(Task taskToClone) {
+        Task newTask = new Task(taskToClone.getName(), taskToClone.getDescription(), taskToClone.getStartTime(), taskToClone.getDuration());
+        newTask.setUin(taskToClone.getUin());
+        newTask.setStatus(taskToClone.getStatus());
+        return newTask;
+    }
+
+    public Epic cloneEpic(Epic epicToClone) {
+        Epic newEpic = new Epic(epicToClone.getName(), epicToClone.getDescription());
+        for (SubTask subtask : epicToClone.getSubTasks()) {
+            newEpic.addSubtask(subtask);
+        }
+        newEpic.setUin(epicToClone.getUin());
+        newEpic.refreshEpicData();
+        newEpic.refreshEndTime();
+        return newEpic;
     }
 }
 

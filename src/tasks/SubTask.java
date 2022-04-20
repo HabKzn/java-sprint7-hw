@@ -42,4 +42,13 @@ public class SubTask extends Task {
     public int hashCode() {
         return Objects.hash(super.hashCode(), getEpic());
     }
+
+
+    public SubTask cloneSubTask(SubTask subTask){
+        SubTask newSubTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getEpic(),
+                subTask.getStartTime(),subTask.getDuration());
+        newSubTask.setUin(subTask.getId());
+        newSubTask.setStatus(subTask.getStatus());
+        return newSubTask;
+    }
 }
