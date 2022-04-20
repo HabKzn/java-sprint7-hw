@@ -39,7 +39,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         SubTask sbt4 = new SubTask("sbt4", "this is subtask4", epc2,
                 LocalDateTime.of(2022,4,16,13,0), Duration.ofMinutes(60));
 
-        FileBackedTasksManager manager = new FileBackedTasksManager("memoryFile.csv");
+      FileBackedTasksManager manager = (FileBackedTasksManager) Managers.getFileBacked();
 
         manager.createEpic(epc1);
         manager.createEpic(epc2);
@@ -57,8 +57,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
 
         FileBackedTasksManager newManager = loadFromFile(file);
-        String firstManager = manager.memoryManager.getTasks().toString();
-        String secondManager = newManager.memoryManager.getTasks().toString();
+        String firstManager = manager.getMemoryManager().getTasks().toString();
+        String secondManager = newManager.getMemoryManager().getTasks().toString();
         System.out.println(firstManager.equals(secondManager));
 
     }
@@ -91,9 +91,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         String[] tempHistory = listOfStrings.get(listOfStrings.size() - 1).split(",");
         for (int i = 0; i < tempHistory.length; i++) {
             int historyElement = Integer.parseInt(tempHistory[i]);
-            manager.memoryManager.add(manager.getTaskUniversal(historyElement));
+            manager.getMemoryManager().add(manager.getTaskUniversal(historyElement));
         }
-        manager.setUin(manager.managerEpicsMap.size() + manager.managerTasksMap.size() + manager.managerSubTasksMap.size());
+        manager.setUin(manager.getManagerEpicsMap().size() + manager.getManagerTasksMap().size() + manager.getManagerSubTasksMap().size());
         manager.save();
        return manager;
     }
@@ -131,7 +131,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public void createSubTask(final SubTask subtask, final int epicId) {
-        super.createSubTask(subtask, managerEpicsMap.get(epicId));
+        super.createSubTask(subtask, getManagerEpicsMap().get(epicId));
         save();
     }
 
@@ -185,30 +185,30 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     @Override
     public Epic getEpicByUin(int uin) {
-        if (managerEpicsMap.get(uin) != null) {
-            memoryManager.add(managerEpicsMap.get(uin));
+        if (getManagerEpicsMap().get(uin) != null) {
+            getMemoryManager().add(getManagerEpicsMap().get(uin));
             save();
-            return managerEpicsMap.get(uin);
+            return getManagerEpicsMap().get(uin);
         } else
             return null;
     }
 
     @Override
     public Task getTaskByUin(int uin) {
-        if (managerTasksMap.get(uin) != null) {
-            memoryManager.add(managerTasksMap.get(uin));
+        if (getManagerTasksMap().get(uin) != null) {
+            getMemoryManager().add(getManagerTasksMap().get(uin));
             save();
-            return managerTasksMap.get(uin);
+            return getManagerTasksMap().get(uin);
         } else
             return null;
     }
 
     @Override
     public Task getSubTaskByUin(int uin) {
-        if (managerSubTasksMap.get(uin) != null) {
-            memoryManager.add(managerSubTasksMap.get(uin));
+        if (getManagerSubTasksMap().get(uin) != null) {
+            getMemoryManager().add(getManagerSubTasksMap().get(uin));
             save();
-            return managerSubTasksMap.get(uin);
+            return getManagerSubTasksMap().get(uin);
         } else
             return null;
     }
@@ -219,7 +219,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
         switch (temp[1]) {
             case "SUBTASK":
-              SubTask  subTask = new SubTask(temp[2], temp[4], managerEpicsMap.get(Integer.parseInt(temp[5])), LocalDateTime.parse(temp[6]),  Duration.parse(temp[7]));
+              SubTask  subTask = new SubTask(temp[2], temp[4], getManagerEpicsMap().get(Integer.parseInt(temp[5])), LocalDateTime.parse(temp[6]),  Duration.parse(temp[7]));
                subTask.setStatus(Status.valueOf(temp[3]));
               subTask.setUin(Integer.parseInt(temp[0]));
                return subTask;

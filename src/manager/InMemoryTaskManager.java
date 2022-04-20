@@ -12,10 +12,10 @@ import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private int uin;
-    public final HashMap<Integer, Task> managerTasksMap;
-    public final HashMap<Integer, Epic> managerEpicsMap;
-    public final HashMap<Integer, SubTask> managerSubTasksMap;
-    public final HistoryManager memoryManager;
+    private final HashMap<Integer, Task> managerTasksMap;
+    private final HashMap<Integer, Epic> managerEpicsMap;
+    private final HashMap<Integer, SubTask> managerSubTasksMap;
+    private final HistoryManager memoryManager;
     public Set<Task> orderedTasksSet;
 
     public InMemoryTaskManager() {
@@ -38,6 +38,22 @@ public class InMemoryTaskManager implements TaskManager {
         orderedTasksSet = new TreeSet<>(taskComparator);
     }
 
+    public HashMap<Integer, SubTask> getManagerSubTasksMap() {
+        return managerSubTasksMap;
+    }
+
+    public Set<Task> getOrderedTasksSet() {
+        return orderedTasksSet;
+    }
+
+    public HashMap<Integer, Epic> getManagerEpicsMap() {
+        return managerEpicsMap;
+    }
+
+    public HashMap<Integer, Task> getManagerTasksMap() {
+        return managerTasksMap;
+    }
+
     public int getUin() {
         return uin;
     }
@@ -46,6 +62,9 @@ public class InMemoryTaskManager implements TaskManager {
         this.uin = uin;
     }
 
+    public HistoryManager getMemoryManager() {
+        return memoryManager;
+    }
 
     @Override
     public ArrayList<Epic> getAllEpicsList() {
