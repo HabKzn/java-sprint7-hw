@@ -44,13 +44,12 @@ public interface TaskManager {
 
     void deleteSubTaskById(int id);
 
-     List<Task> history();
+    List<Task> history();
 
     void removeFromHistoryByID(int id);
 
     Task getTaskUniversal(int id);
 
     List<Task> getPrioritizedTask();
-
 
 }

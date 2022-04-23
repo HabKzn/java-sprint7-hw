@@ -63,7 +63,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     }
 
-    static FileBackedTasksManager loadFromFile(File file) {
+  public  static FileBackedTasksManager loadFromFile(File file) {
         List<String> listOfStrings;
         FileBackedTasksManager manager;
         try {

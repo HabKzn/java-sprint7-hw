@@ -12,6 +12,9 @@ public class Task {
     private Duration duration;
     private LocalDateTime startTime;
 
+    public Task() {
+    }
+
     public Task(final String name, final String description) {
         this.name = name;
         this.description = description;

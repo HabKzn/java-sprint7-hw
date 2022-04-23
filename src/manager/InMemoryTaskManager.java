@@ -308,9 +308,11 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     @Override
-    public List<Task> getPrioritizedTask() {
-        return new ArrayList<>(orderedTasksSet);
+    public ArrayList<Task> getPrioritizedTask() {
+         return new ArrayList<Task>(getOrderedTasksSet());
     }
+
+
 
     public Task cloneTask(Task taskToClone) {
         Task newTask = new Task(taskToClone.getName(), taskToClone.getDescription(), taskToClone.getStartTime(), taskToClone.getDuration());
