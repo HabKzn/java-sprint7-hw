@@ -1,24 +1,27 @@
+import HTTP.HttpTaskServer;
 import HTTP.TaskAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import manager.FileBackedTasksManager;
 import tasks.Task;
 
+import java.io.File;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Main {
     public static void main(String[] args) {
-//        FileBackedTasksManager  manager = FileBackedTasksManager.loadFromFile(new File("memoryFile.csv"));
-//
-//   HttpTaskServer server = new HttpTaskServer(manager);
-//        server.start();
-//        FileBackedTasksManager  manager = FileBackedTasksManager.loadFromFile(new File("memoryFile.csv"));
-//       var a = manager.getPrioritizedTask();
-//        Gson gson = new GsonBuilder()
-//                .setPrettyPrinting()
-//                .registerTypeAdapter(Task.class, new TaskAdapter())
-//                .create();
-//
+        FileBackedTasksManager manager = FileBackedTasksManager.loadFromFile(new File("memoryFile.csv"));
+
+  HttpTaskServer server = new HttpTaskServer(manager);
+        server.start();
+       // FileBackedTasksManager  manager = FileBackedTasksManager.loadFromFile(new File("memoryFile.csv"));
+       var a = manager.getPrioritizedTask();
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(Task.class, new TaskAdapter())
+                .create();
+
 //        System.out.println(gson.toJson(a));
 //        System.out.println(manager.getPrioritizedTask());
 //        Task task = new Task("name", "description",
