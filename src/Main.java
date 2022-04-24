@@ -1,13 +1,11 @@
-import HTTP.HttpTaskServer;
-import HTTP.TaskAdapter;
+import HTTP.adapters.HttpTaskServer;
+import HTTP.adapters.TaskAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import manager.FileBackedTasksManager;
 import tasks.Task;
 
 import java.io.File;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,7 +13,6 @@ public class Main {
 
   HttpTaskServer server = new HttpTaskServer(manager);
         server.start();
-       // FileBackedTasksManager  manager = FileBackedTasksManager.loadFromFile(new File("memoryFile.csv"));
        var a = manager.getPrioritizedTask();
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()

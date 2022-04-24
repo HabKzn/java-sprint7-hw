@@ -1,26 +1,27 @@
-package HTTP;
+package HTTP.handlers;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
+import tasks.Task;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 
-public class Handler implements HttpHandler {
+public class MainHandler implements HttpHandler {
     HttpResponse<String> response;
     HttpExchange exchange;
     String[] pathSplitted;
     TaskManager manager;
     String path;
 
-    public Handler(final TaskManager manager) {
+    public MainHandler(final TaskManager manager) {
         this.manager = manager;
     }
-
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         this.exchange = exchange;
@@ -93,7 +94,7 @@ public class Handler implements HttpHandler {
     }
 
     void deleteHandler() throws IOException {
-        switch (pathSplitted[2].toLowerCase()) {
+        switch (pathSplitted[2]) {
 
             case "task":
                 taskDELETEhandle();
@@ -115,9 +116,8 @@ public class Handler implements HttpHandler {
 
     void postHandler() throws IOException {
         switch (pathSplitted[2].toLowerCase()) {
-
             case "task":
-
+                taskPOSThandler();
                 break;
 
             case "subtask":
@@ -133,9 +133,7 @@ public class Handler implements HttpHandler {
         }
     }
 
-
     void taskGEThandle() throws IOException {
-
         if (pathSplitted.length == 3) {
            sendPositiveresponse("/tasks/task");
         } else if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
@@ -143,95 +141,68 @@ public class Handler implements HttpHandler {
                 StringBuilder sb = new StringBuilder(pathSplitted[3]);
                 sb.delete(0, 4);
                 if (isDigit(sb.toString())) {
-                    System.out.println(Integer.parseInt(sb.toString()));
-                    sendPositiveresponse("/tasks/task/?id=");
-                } else {
-                   sendNegativeResponse();
+                    int id = Integer.parseInt(sb.toString());
+                    if (id == -1) {
+                        exchange.sendResponseHeaders(405, 0);
+                    } else {
+                        exchange.sendResponseHeaders(200, 0);
+                        GsonBuilder gsonBuilder = new GsonBuilder();
+                        gsonBuilder.setPrettyPrinting();
+                        Gson gson = gsonBuilder.create();
+                        Task task = manager.getTaskByUin(id);
+                        String taskSerialized = gson.toJson(task);
+                        try (OutputStream os = exchange.getResponseBody()) {
+                            os.write(taskSerialized.getBytes());
+                            exchange.close();
+                        }
+                    }
+                    exchange.sendResponseHeaders(200, 0);
+                    String a = "запрос /tasks/task/?id= работает верно";
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(a.getBytes());
+                    }
                 }
             }
-
-
-            exchange.sendResponseHeaders(200, 0);
-            String a = "запрос /tasks/task/?id= работает верно";
-            try (OutputStream os = exchange.getResponseBody()) {
-                os.write(a.getBytes());
-
-            }
-//        String thirdElementOfPath = pathSplitted[3];
-//
-//        if ("".equals(thirdElementOfPath)) {
-//            manager.getAllTasksList();
-//            exchange.sendResponseHeaders(200, 0);
-//        } else {
-//            int id = extractId(thirdElementOfPath);
-//            if (id == -1) {
-//                exchange.sendResponseHeaders(405, 0);
-//            } else {
-//                exchange.sendResponseHeaders(200, 0);
-//                Task task = manager.getTaskByUin(id);
-//                String taskSerialized = gson.toJson(task);
-//                try (OutputStream os = exchange.getResponseBody()) {
-//                    os.write(taskSerialized.getBytes());
-//                    exchange.close();
-            //  }}}
         }
     }
 
+    void taskPOSThandler() {
+    }
 
 
     void taskDELETEhandle() throws IOException {
 
-        String thirdElementOfPath = pathSplitted[3];
-
-        if ("".equals(thirdElementOfPath)) {
-            manager.getAllTasksList();
-            exchange.sendResponseHeaders(200, 0);
-           manager.clearTasks();
-        } else {
-//            int id = extractId(thirdElementOfPath);
-//            if (id == -1) {
-//                exchange.sendResponseHeaders(405, 0);
-//            } else {
-//                exchange.sendResponseHeaders(200, 0);
-//              manager.deleteTaskById(id);
-//            }
-        }
+        if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
+            StringBuilder sb = new StringBuilder(pathSplitted[3]);
+            sb.delete(0, 4);
+            if (isDigit(sb.toString())) {
+                sendPositiveresponse("/tasks/task/?id=");
+            } else sendNegativeResponse();
+        } else if (pathSplitted.length == 3) {
+            sendPositiveresponse("/tasks/task/");
+        } else
+            sendNegativeResponse();
     }
 
+    void subTaskPOSThandle() {
+    }
 
-
-//    void taskPOSThandle() {
-//    Task task;
-//    InputStream is = exchange.getRequestBody();
-//    String body = is.
-//
-//
-//
-//        HttpTaskServer.manager.createTask(task);
-//        HttpTaskServer.manager.updateTask(task);
-//
-//
-//
-//
-//
-//
-//
-//
-//    }
+    void epicPOSThandle() {
+    }
 
     void subTaskGEThandle() throws IOException {
         if (pathSplitted.length == 3) {
             sendPositiveresponse("/tasks/subtask");
         } else if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
-                StringBuilder sb = new StringBuilder(pathSplitted[3]);
-                sb.delete(0, 4);
-                if (isDigit(sb.toString())) {
-                    System.out.println(Integer.parseInt(sb.toString()));
-                    sendPositiveresponse("/tasks/subtask/?id=");
-                } else {
-                    sendNegativeResponse();
-                }
-    }else if(pathSplitted.length == 5 && pathSplitted[4].startsWith("?id=") &&pathSplitted[3].equals("epic")){
+            StringBuilder sb = new StringBuilder(pathSplitted[3]);
+            sb.delete(0, 4);
+            if (isDigit(sb.toString())) {
+                System.out.println(Integer.parseInt(sb.toString()));
+                sendPositiveresponse("/tasks/subtask/?id=");
+            } else {
+                sendNegativeResponse();
+            }
+        }else if(pathSplitted.length == 5 && pathSplitted[4].startsWith("?id=") &&pathSplitted[3].equals("epic")){
             StringBuilder sb = new StringBuilder(pathSplitted[4]);
             sb.delete(0, 4);
             if (isDigit(sb.toString())) {
@@ -244,39 +215,56 @@ public class Handler implements HttpHandler {
         }
     }
 
-    void subTaskDELETEhandle() {
+    void subTaskDELETEhandle() throws IOException {
+        if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
+            StringBuilder sb = new StringBuilder(pathSplitted[3]);
+            sb.delete(0, 4);
+            if (isDigit(sb.toString())) {
+                sendPositiveresponse("/tasks/subtask/?id=");
+            } else sendNegativeResponse();
+        } else if (pathSplitted.length == 3) {
+            sendPositiveresponse("/tasks/subtask/");
+        } else
+            sendNegativeResponse();
+
     }
 
-    void subTaskPOSThandle() {
-    }
 
     void epicGEThandle() throws IOException {
-                  if (pathSplitted.length == 3) {
-                sendPositiveresponse("/tasks/epic");
-            } else if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
-                {
-                    StringBuilder sb = new StringBuilder(pathSplitted[3]);
-                    sb.delete(0, 4);
-                    if (isDigit(sb.toString())) {
-                        System.out.println(Integer.parseInt(sb.toString()));
-                        sendPositiveresponse("/tasks/epic/?id=");
-                    } else {
-                        sendNegativeResponse();
-                    }
-                }
-                exchange.sendResponseHeaders(200, 0);
-                String a = "запрос /tasks/epic/?id= работает верно";
-                try (OutputStream os = exchange.getResponseBody()) {
-                    os.write(a.getBytes());
+        if (pathSplitted.length == 3) {
+            sendPositiveresponse("/tasks/epic");
+        } else if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
+            {
+                StringBuilder sb = new StringBuilder(pathSplitted[3]);
+                sb.delete(0, 4);
+                if (isDigit(sb.toString())) {
+                    System.out.println(Integer.parseInt(sb.toString()));
+                    sendPositiveresponse("/tasks/epic/?id=");
+                } else {
+                    sendNegativeResponse();
                 }
             }
+            exchange.sendResponseHeaders(200, 0);
+            String a = "запрос /tasks/epic/?id= работает верно";
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(a.getBytes());
+            }
+        }
     }
 
-    void epicDELETEhandle() {
+    void epicDELETEhandle() throws IOException {
+        if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
+            StringBuilder sb = new StringBuilder(pathSplitted[3]);
+            sb.delete(0, 4);
+            if (isDigit(sb.toString())) {
+                sendPositiveresponse("/tasks/epic/?id=");
+            } else sendNegativeResponse();
+        } else if (pathSplitted.length == 3) {
+            sendPositiveresponse("/tasks/epic/");
+        } else
+            sendNegativeResponse();
     }
 
-    void epicPOSThandle() {
-    }
 
     void historyhandle() {
     }
