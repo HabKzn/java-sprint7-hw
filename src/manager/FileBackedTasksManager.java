@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,11 +57,22 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         manager.getSubTaskByUin(sbt1.getUin());
 
 
+
+
+        Task task = new Task("Taskname", "Taskdescription");
+        task.setStartTime(LocalDateTime.of(2033,2,3,12,0));
+        task.setStatus(Status.DONE);
+        task.setDuration(Duration.ofMinutes(60));
+        manager.createTask(task);
+        manager.updateTask(task);
+manager.getTaskByUin(7);
+
         FileBackedTasksManager newManager = loadFromFile(file);
         String firstManager = manager.getMemoryManager().getTasks().toString();
         String secondManager = newManager.getMemoryManager().getTasks().toString();
         System.out.println(firstManager.equals(secondManager));
-
+        System.out.println(firstManager);
+        System.out.println(secondManager);
     }
 
   public  static FileBackedTasksManager loadFromFile(File file) {
@@ -73,15 +85,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             for (int i = 1; i < listOfStrings.size() - 2; i++) {
                Task task = manager.fromString(listOfStrings.get(i));
                 if (task instanceof Epic) {
-                  manager.createEpic((Epic)task);
+                  manager.createEpicWhileLoading((Epic)task);
                 }
             }
             for (int i = 1; i < listOfStrings.size() - 2; i++) {
                 Task task = manager.fromString(listOfStrings.get(i));
                 if (task instanceof SubTask) {
-                    manager.createSubTask((SubTask) task, ((SubTask) task).getEpic());
+                    manager.createSubTaskWhileLoading((SubTask) task);
                 } else if (task != null && !(task instanceof Epic)) {
-                    manager.createTask(task);
+                    manager.createTaskWhileLoading(task);
                 }
             }
         } catch (IOException e) {
@@ -242,4 +254,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 return null;
         }
     }
+
+
 }

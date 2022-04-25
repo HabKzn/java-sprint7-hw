@@ -327,6 +327,36 @@ public class InMemoryTaskManager implements TaskManager {
         newSubTask.setStatus(subTask.getStatus());
         return newSubTask;
     }
+
+    public void createTaskWhileLoading(Task task) {
+
+        if (taskIsValid(task)) {
+            uin = task.getUin();
+            managerTasksMap.put(uin, task);
+            task.setUin(uin);
+            task.setStatus(Status.NEW);
+            orderedTasksSet.add(task);
+        }
+    }
+
+    public void createSubTaskWhileLoading(SubTask subtask) {
+
+        if (taskIsValid(subtask)) {
+            uin = subtask.getUin();
+            managerSubTasksMap.put(uin, subtask);
+            subtask.setUin(uin);
+            subtask.getEpic().addSubTaskToEpicList(subtask);
+            subtask.getEpic().refreshEpicData();
+            orderedTasksSet.add(subtask);
+        }
+    }
+
+    public void createEpicWhileLoading(Epic epic) {
+        uin = epic.getUin();
+        managerEpicsMap.put(uin, epic);
+        epic.setUin(uin);
+        epic.setStatus(epic.getStatus());
+    }
 }
 
 

@@ -1,5 +1,6 @@
-package HTTP.handlers;
+package HTTP;
 
+import HTTP.adapters.TaskAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
@@ -137,17 +138,13 @@ public class MainHandler implements HttpHandler {
         if (pathSplitted.length == 3) {
            sendPositiveresponse("/tasks/task");
         } else if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
-            {
                 StringBuilder sb = new StringBuilder(pathSplitted[3]);
                 sb.delete(0, 4);
-                if (isDigit(sb.toString())) {
+                if (isPositiveDigit(sb.toString())) {
                     int id = Integer.parseInt(sb.toString());
-                    if (id == -1) {
-                        exchange.sendResponseHeaders(405, 0);
-                    } else {
                         exchange.sendResponseHeaders(200, 0);
                         GsonBuilder gsonBuilder = new GsonBuilder();
-                        gsonBuilder.setPrettyPrinting();
+                        gsonBuilder.setPrettyPrinting().registerTypeAdapter(Task.class, new TaskAdapter());
                         Gson gson = gsonBuilder.create();
                         Task task = manager.getTaskByUin(id);
                         String taskSerialized = gson.toJson(task);
@@ -155,15 +152,8 @@ public class MainHandler implements HttpHandler {
                             os.write(taskSerialized.getBytes());
                             exchange.close();
                         }
-                    }
-                    exchange.sendResponseHeaders(200, 0);
-                    String a = "запрос /tasks/task/?id= работает верно";
-                    try (OutputStream os = exchange.getResponseBody()) {
-                        os.write(a.getBytes());
-                    }
-                }
-            }
-        }
+                }else  exchange.sendResponseHeaders(405, 0);
+        }else exchange.sendResponseHeaders(400, 0);
     }
 
     void taskPOSThandler() {
@@ -175,7 +165,7 @@ public class MainHandler implements HttpHandler {
         if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
             StringBuilder sb = new StringBuilder(pathSplitted[3]);
             sb.delete(0, 4);
-            if (isDigit(sb.toString())) {
+            if (isPositiveDigit(sb.toString())) {
                 sendPositiveresponse("/tasks/task/?id=");
             } else sendNegativeResponse();
         } else if (pathSplitted.length == 3) {
@@ -196,7 +186,7 @@ public class MainHandler implements HttpHandler {
         } else if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
             StringBuilder sb = new StringBuilder(pathSplitted[3]);
             sb.delete(0, 4);
-            if (isDigit(sb.toString())) {
+            if (isPositiveDigit(sb.toString())) {
                 System.out.println(Integer.parseInt(sb.toString()));
                 sendPositiveresponse("/tasks/subtask/?id=");
             } else {
@@ -205,7 +195,7 @@ public class MainHandler implements HttpHandler {
         }else if(pathSplitted.length == 5 && pathSplitted[4].startsWith("?id=") &&pathSplitted[3].equals("epic")){
             StringBuilder sb = new StringBuilder(pathSplitted[4]);
             sb.delete(0, 4);
-            if (isDigit(sb.toString())) {
+            if (isPositiveDigit(sb.toString())) {
                 System.out.println(Integer.parseInt(sb.toString()));
                 sendPositiveresponse("/tasks/subtask/epic/?id=");
             } else {
@@ -219,7 +209,7 @@ public class MainHandler implements HttpHandler {
         if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
             StringBuilder sb = new StringBuilder(pathSplitted[3]);
             sb.delete(0, 4);
-            if (isDigit(sb.toString())) {
+            if (isPositiveDigit(sb.toString())) {
                 sendPositiveresponse("/tasks/subtask/?id=");
             } else sendNegativeResponse();
         } else if (pathSplitted.length == 3) {
@@ -237,7 +227,7 @@ public class MainHandler implements HttpHandler {
             {
                 StringBuilder sb = new StringBuilder(pathSplitted[3]);
                 sb.delete(0, 4);
-                if (isDigit(sb.toString())) {
+                if (isPositiveDigit(sb.toString())) {
                     System.out.println(Integer.parseInt(sb.toString()));
                     sendPositiveresponse("/tasks/epic/?id=");
                 } else {
@@ -256,7 +246,7 @@ public class MainHandler implements HttpHandler {
         if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
             StringBuilder sb = new StringBuilder(pathSplitted[3]);
             sb.delete(0, 4);
-            if (isDigit(sb.toString())) {
+            if (isPositiveDigit(sb.toString())) {
                 sendPositiveresponse("/tasks/epic/?id=");
             } else sendNegativeResponse();
         } else if (pathSplitted.length == 3) {
@@ -271,12 +261,12 @@ public class MainHandler implements HttpHandler {
 
     int extractId(String thirdElementOfPath) {
         String[] thirdElementSplitted = thirdElementOfPath.split("\\?id=");
-        if (thirdElementSplitted[0].equals("") && isDigit(thirdElementSplitted[2])) {
+        if (thirdElementSplitted[0].equals("") && isPositiveDigit(thirdElementSplitted[2])) {
             return Integer.parseInt(thirdElementSplitted[2]);
         } else return -1;
     }
 
-    private static boolean isDigit(String s) throws NumberFormatException {
+    private static boolean isPositiveDigit(String s) throws NumberFormatException {
         try {
             return Integer.parseInt(s) >= 0;
         } catch (NumberFormatException e) {

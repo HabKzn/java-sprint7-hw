@@ -13,11 +13,6 @@ public class Main {
 
   HttpTaskServer server = new HttpTaskServer(manager);
         server.start();
-       var a = manager.getPrioritizedTask();
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(Task.class, new TaskAdapter())
-                .create();
 
 //        System.out.println(gson.toJson(a));
 //        System.out.println(manager.getPrioritizedTask());
