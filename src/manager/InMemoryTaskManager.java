@@ -140,7 +140,7 @@ public class InMemoryTaskManager implements TaskManager {
             uin += 1;
             managerTasksMap.put(uin, task);
             task.setUin(uin);
-            task.setStatus(Status.NEW);
+            task.setStatus(task.getStatus());
             orderedTasksSet.add(task);
         }
     }
@@ -334,7 +334,7 @@ public class InMemoryTaskManager implements TaskManager {
             uin = task.getUin();
             managerTasksMap.put(uin, task);
             task.setUin(uin);
-            task.setStatus(Status.NEW);
+           // task.setStatus(task.getStatus());
             orderedTasksSet.add(task);
         }
     }

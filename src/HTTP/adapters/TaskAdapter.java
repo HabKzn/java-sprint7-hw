@@ -35,7 +35,6 @@ public class TaskAdapter extends TypeAdapter<Task> {
        task.setDuration(Duration.parse(in.nextString()));
         System.out.println();
         in.endArray();
-
         return task;
     }
 }

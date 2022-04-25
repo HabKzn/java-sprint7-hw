@@ -12,13 +12,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-   static File file;
+    static File file;
 
     public FileBackedTasksManager(String stringPath) {
         file = new File(stringPath);
@@ -40,7 +39,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         SubTask sbt4 = new SubTask("sbt4", "this is subtask4", epc2,
                 LocalDateTime.of(2022,4,16,13,0), Duration.ofMinutes(60));
 
-      FileBackedTasksManager manager = (FileBackedTasksManager) Managers.getFileBacked();
+        FileBackedTasksManager manager = (FileBackedTasksManager) Managers.getFileBacked();
 
         manager.createEpic(epc1);
         manager.createEpic(epc2);
@@ -56,16 +55,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         manager.getSubTaskByUin(sbt2.getUin());
         manager.getSubTaskByUin(sbt1.getUin());
 
-
-
-
         Task task = new Task("Taskname", "Taskdescription");
-        task.setStartTime(LocalDateTime.of(2033,2,3,12,0));
+        task.setStartTime(LocalDateTime.of(2024,2,3,12,0));
         task.setStatus(Status.DONE);
         task.setDuration(Duration.ofMinutes(60));
         manager.createTask(task);
         manager.updateTask(task);
-manager.getTaskByUin(7);
+        manager.getTaskByUin(7);
+
+        Task task2 = new Task("Taskname2", "Taskdescription2");
+        task2.setStartTime(LocalDateTime.of(2055,11,3,12,0));
+        task2.setStatus(Status.IN_PROGRESS);
+        task2.setDuration(Duration.ofMinutes(120));
+        manager.createTask(task2);
+        manager.updateTask(task2);
+        manager.getTaskByUin(8);
 
         FileBackedTasksManager newManager = loadFromFile(file);
         String firstManager = manager.getMemoryManager().getTasks().toString();
@@ -75,7 +79,7 @@ manager.getTaskByUin(7);
         System.out.println(secondManager);
     }
 
-  public  static FileBackedTasksManager loadFromFile(File file) {
+    public  static FileBackedTasksManager loadFromFile(File file) {
         List<String> listOfStrings;
         FileBackedTasksManager manager;
         try {
@@ -83,9 +87,9 @@ manager.getTaskByUin(7);
             manager = new FileBackedTasksManager(file.getPath());
 
             for (int i = 1; i < listOfStrings.size() - 2; i++) {
-               Task task = manager.fromString(listOfStrings.get(i));
+                Task task = manager.fromString(listOfStrings.get(i));
                 if (task instanceof Epic) {
-                  manager.createEpicWhileLoading((Epic)task);
+                    manager.createEpicWhileLoading((Epic)task);
                 }
             }
             for (int i = 1; i < listOfStrings.size() - 2; i++) {
@@ -107,7 +111,7 @@ manager.getTaskByUin(7);
         }
         manager.setUin(manager.getManagerEpicsMap().size() + manager.getManagerTasksMap().size() + manager.getManagerSubTasksMap().size());
         manager.save();
-       return manager;
+        return manager;
     }
 
     public void save() {
@@ -231,23 +235,23 @@ manager.getTaskByUin(7);
 
         switch (temp[1]) {
             case "SUBTASK":
-              SubTask  subTask = new SubTask(temp[2], temp[4], getManagerEpicsMap().get(Integer.parseInt(temp[5])), LocalDateTime.parse(temp[6]),  Duration.parse(temp[7]));
-               subTask.setStatus(Status.valueOf(temp[3]));
-              subTask.setUin(Integer.parseInt(temp[0]));
-               return subTask;
+                SubTask  subTask = new SubTask(temp[2], temp[4], getManagerEpicsMap().get(Integer.parseInt(temp[5])), LocalDateTime.parse(temp[6]),  Duration.parse(temp[7]));
+                subTask.setStatus(Status.valueOf(temp[3]));
+                subTask.setUin(Integer.parseInt(temp[0]));
+                return subTask;
             case "EPIC":
-              Epic epic = new Epic((temp[2]), temp[4] );
+                Epic epic = new Epic((temp[2]), temp[4] );
                 epic.setStartTime(LocalDateTime.parse(temp[5]));
                 epic.setDuration(Duration.parse(temp[6]));
                 epic.setStatus(Status.valueOf(temp[3]));
-                 epic.setEndTime(LocalDateTime.parse(temp[7]));
-                 epic.setUin(Integer.parseInt(temp[0]));
-                 return epic;
+                epic.setEndTime(LocalDateTime.parse(temp[7]));
+                epic.setUin(Integer.parseInt(temp[0]));
+                return epic;
 
             case "TASK":
                 Task task = new Task(temp[2], temp[4],LocalDateTime.parse(temp[5]), Duration.parse(temp[6]));
                 task.setStatus(Status.valueOf(temp[3]));
-               task.setUin(Integer.parseInt(temp[0]));
+                task.setUin(Integer.parseInt(temp[0]));
                 return task;
 
             default:

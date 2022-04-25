@@ -65,7 +65,6 @@ public class HttpTaskServer {
     public static class ArrayListOfTasksAdapter extends TypeAdapter<ArrayList<Task>> {
         @Override
         public void write(final JsonWriter jsonWriter, final ArrayList<Task> tasks) throws IOException {
-
         }
 
         @Override

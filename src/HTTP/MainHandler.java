@@ -3,6 +3,7 @@ package HTTP;
 import HTTP.adapters.TaskAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
@@ -10,8 +11,10 @@ import tasks.Task;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 public class MainHandler implements HttpHandler {
     HttpResponse<String> response;
@@ -135,23 +138,30 @@ public class MainHandler implements HttpHandler {
     }
 
     void taskGEThandle() throws IOException {
+        GsonBuilder gbuilder = new GsonBuilder().setPrettyPrinting();
+        Gson gson = gbuilder.create();
         if (pathSplitted.length == 3) {
-           sendPositiveresponse("/tasks/task");
+            exchange.sendResponseHeaders(200, 0);
+            String js = gson.toJson(manager.getAllTasksList());
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(js.getBytes());
+                exchange.close();
+
+            }
         } else if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
                 StringBuilder sb = new StringBuilder(pathSplitted[3]);
                 sb.delete(0, 4);
                 if (isPositiveDigit(sb.toString())) {
                     int id = Integer.parseInt(sb.toString());
+                    if (manager.getManagerTasksMap().containsKey(id)) {
                         exchange.sendResponseHeaders(200, 0);
-                        GsonBuilder gsonBuilder = new GsonBuilder();
-                        gsonBuilder.setPrettyPrinting().registerTypeAdapter(Task.class, new TaskAdapter());
-                        Gson gson = gsonBuilder.create();
                         Task task = manager.getTaskByUin(id);
                         String taskSerialized = gson.toJson(task);
                         try (OutputStream os = exchange.getResponseBody()) {
                             os.write(taskSerialized.getBytes());
                             exchange.close();
                         }
+                    } else exchange.sendResponseHeaders(405, 0);
                 }else  exchange.sendResponseHeaders(405, 0);
         }else exchange.sendResponseHeaders(400, 0);
     }
