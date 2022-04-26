@@ -23,11 +23,11 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         emptyManager = new FileBackedTasksManager("tests.csv");
         filledManager.createTask(task);
         filledManager.createEpic(epic1);
-        filledManager.createSubTask(subTask11, epic1);
-        filledManager.createSubTask(subTask12, epic1);
+        filledManager.createSubTask(subTask11, 2);
+        filledManager.createSubTask(subTask12, 2);
         filledManager.createEpic(epic2);
-        filledManager.createSubTask(subTask21, epic2);
-         SubTask doneSubTask = cloneSubTask(subTask21);
+        filledManager.createSubTask(subTask21, 5);
+         SubTask doneSubTask = cloneSubTask((SubTask) filledManager.getManagerSubTasksMap().get(6));
          doneSubTask.setStatus(Status.DONE);
         filledManager.updateSubTask(doneSubTask);
     }

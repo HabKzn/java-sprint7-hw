@@ -22,11 +22,11 @@ class HistoryManagerTest {
     @BeforeEach
     void createManager () {
         manager = new InMemoryHistoryManager();
-        task = new Task("name", "description", LocalDateTime.of(2022,04,16,10,0), Duration.ofMinutes(50));
+        task = new Task("name", "description", LocalDateTime.of(2022,4,16,10,0), Duration.ofMinutes(50));
         task.setUin(1);
         epic = new Epic("epicName", "epicDescription");
         epic.setUin(2);
-        subTask = new SubTask("subTaskName", "subTaskDescription", epic, LocalDateTime.of(2022,4,16,10,50), Duration.ofMinutes(50));
+        subTask = new SubTask("subTaskName", "subTaskDescription", epic.getId(), LocalDateTime.of(2022,4,16,10,50), Duration.ofMinutes(50));
         subTask.setUin(3);
     }
 

@@ -6,12 +6,16 @@ import java.util.Objects;
 
 public class SubTask extends Task {
 
-    private final Epic epic;
+    private int epicId;
 
-    public SubTask(String name, String description, Epic epic, LocalDateTime startTime, Duration duration) {
+    public SubTask(String name, String description, int epicId, LocalDateTime startTime, Duration duration) {
         super(name, description, startTime, duration);
-        this.epic = epic;
+        this.epicId = epicId;
         setStatus(Status.NEW);
+    }
+
+    public void setEpicId(int epicId) {
+        this.epicId = epicId;
     }
 
     @Override
@@ -19,14 +23,14 @@ public class SubTask extends Task {
         return Types.SUBTASK;
     }
 
-    public Epic getEpic() {
-        return epic;
+    public int getEpicId() {
+        return epicId;
     }
 
     @Override
     public String toString() {
         return getId() + "," + getType() + "," + getName() + "," + getStatus() + "," + getDescription() + ","
-                + getEpic().getId() + "," + getStartTime() + "," + getDuration() + "," + getEndTime();
+                + getEpicId() + "," + getStartTime() + "," + getDuration() + "," + getEndTime();
     }
 
     @Override
@@ -35,18 +39,18 @@ public class SubTask extends Task {
         if (!(o instanceof SubTask)) return false;
         if (!super.equals(o)) return false;
         final SubTask subTask = (SubTask) o;
-        return getEpic().equals(subTask.getEpic());
+        return getEpicId() == (subTask.getEpicId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getEpic());
+        return Objects.hash(super.hashCode(), getEpicId());
     }
 
 
     public SubTask cloneSubTask(SubTask subTask){
-        SubTask newSubTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getEpic(),
-                subTask.getStartTime(),subTask.getDuration());
+        SubTask newSubTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getEpicId(),
+                subTask.getStartTime(), subTask.getDuration());
         newSubTask.setUin(subTask.getId());
         newSubTask.setStatus(subTask.getStatus());
         return newSubTask;

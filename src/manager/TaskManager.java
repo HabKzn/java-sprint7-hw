@@ -29,7 +29,7 @@ public interface TaskManager {
 
     void createTask(Task task);
 
-    void createSubTask(SubTask subtask, Epic epic);
+    void createSubTask(SubTask subtask, int epicId);
 
     void createEpic(Epic epic);
 

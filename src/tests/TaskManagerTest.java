@@ -1,5 +1,6 @@
 package tests;
 
+import manager.InMemoryTaskManager;
 import manager.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,8 +30,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     String subTask11TestString = "3,SUBTASK,subTask11Name,NEW,subTask11Description,2,2022-04-16T10:00,PT1H,2022-04-16T11:00";
     String subTask12TestString = "4,SUBTASK,subTask12Name,NEW,subTask12Description,2,2022-04-16T11:00,PT1H,2022-04-16T12:00";
 
-    //Здравствуйте! Как бы я не старался, у меня не получилось заполнить менеджеры в этом классе.
-    // Все остальные ваши замечания я исправил. Так как это не строгое замечание, решил оставить так.
+
 
     @BeforeEach
     void createTasks() {
@@ -39,15 +39,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         epic1 = new Epic("epic1Name", "epic1Description");
 
-        subTask11 = new SubTask("subTask11Name", "subTask11Description", epic1,
+        subTask11 = new SubTask("subTask11Name", "subTask11Description", epic1.getId(),
                 LocalDateTime.of(2022, 4, 16, 10, 0), Duration.ofMinutes(60));
 
-        subTask12 = new SubTask("subTask12Name", "subTask12Description", epic1,
+        subTask12 = new SubTask("subTask12Name", "subTask12Description", epic1.getId(),
                 LocalDateTime.of(2022, 4, 16, 11, 0), Duration.ofMinutes(60));
 
         epic2 = new Epic("epic2Name", "epic2Description");
 
-        subTask21 = new SubTask("subTask21Name", "subTask21Description", epic2,
+        subTask21 = new SubTask("subTask21Name", "subTask21Description", epic2.getId(),
                 LocalDateTime.of(2022, 4, 16, 13, 0), Duration.ofMinutes(60));
     }
 
@@ -201,21 +201,24 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void createSubTaskWithNotEmptyTaskList() {
         SubTask subtask = new SubTask("subtaskname", "subtaskdescription",
-                (Epic) filledManager.getTaskUniversal(2),
+                2,
                 LocalDateTime.of(2022, 4, 17, 11, 0),
                 Duration.ofMinutes(40));
         assertEquals(3, filledManager.getAllSubTasksList().size());
-        filledManager.createSubTask(subtask, subtask.getEpic());
+        filledManager.createSubTask(subtask, subtask.getEpicId());
         assertEquals(4, filledManager.getAllSubTasksList().size());
     }
 
     @Test
     void createSubTaskWithEmptyTaskList() {
         Epic epic = new Epic("epicname", "epicdescription");
-        SubTask subtask = new SubTask("subtaskname", "subtaskdescription", epic,
+        epic.setStartTime(LocalDateTime.of(2011,2,3,12,3));
+        epic.setDuration(Duration.ofMinutes(12));
+       emptyManager.createEpic(epic);
+        SubTask subtask = new SubTask("subtaskname", "subtaskdescription", epic.getId(),
                 LocalDateTime.of(2022, 4, 17, 11, 0), Duration.ofMinutes(40));
         assertEquals(0, emptyManager.getAllSubTasksList().size());
-        emptyManager.createSubTask(subtask, epic);
+        emptyManager.createSubTask(subtask, epic.getId());
         assertEquals(1, emptyManager.getAllSubTasksList().size());
     }
 
@@ -269,7 +272,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void updateSubtaskIfListIsEmpty() {
-        SubTask subtask = new SubTask("name", "Surname", new Epic("name", "Surname"),
+        SubTask subtask = new SubTask("name", "Surname", 1,
                 LocalDateTime.of(2022, 4, 17, 11, 0), Duration.ofMinutes(40));
         subtask.setStatus(Status.DONE);
         emptyManager.updateSubTask(subtask);
@@ -516,7 +519,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     //    служебные методы для некоторых тестов:
     public SubTask cloneSubTask(SubTask subTask) {
-        SubTask newSubTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getEpic(), subTask.getStartTime(), subTask.getDuration());
+        SubTask newSubTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getEpicId(), subTask.getStartTime(), subTask.getDuration());
         newSubTask.setUin(subTask.getId());
         newSubTask.setStatus(subTask.getStatus());
         return newSubTask;

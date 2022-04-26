@@ -24,29 +24,30 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args)  {
+        FileBackedTasksManager manager = (FileBackedTasksManager) Managers.getFileBacked();
         Epic epc1 = new Epic("epc1", "this is epic N1");
         Epic epc2 = new Epic("epc2", "this is epic N2");
-
-        SubTask sbt1 = new SubTask("sbt1", "this is subtask1", epc1,
-                LocalDateTime.of(2022,4,16,10,0), Duration.ofMinutes(60));
-
-        SubTask sbt2 = new SubTask("sbt2", "this is subtask2", epc1,
-                LocalDateTime.of(2022,4,16,11,0), Duration.ofMinutes(60));
-
-        SubTask sbt3 = new SubTask("sbt3", "this is subtask3", epc2,
-                LocalDateTime.of(2022, 4,16,12,0), Duration.ofMinutes(60));
-
-        SubTask sbt4 = new SubTask("sbt4", "this is subtask4", epc2,
-                LocalDateTime.of(2022,4,16,13,0), Duration.ofMinutes(60));
-
-        FileBackedTasksManager manager = (FileBackedTasksManager) Managers.getFileBacked();
-
         manager.createEpic(epc1);
         manager.createEpic(epc2);
-        manager.createSubTask(sbt1, sbt1.getEpic());
-        manager.createSubTask(sbt2, sbt2.getEpic());
-        manager.createSubTask(sbt3, sbt3.getEpic());
-        manager.createSubTask(sbt4, sbt4.getEpic());
+        SubTask sbt1 = new SubTask("sbt1", "this is subtask1", epc1.getId(),
+                LocalDateTime.of(2022,4,16,10,0), Duration.ofMinutes(60));
+
+        SubTask sbt2 = new SubTask("sbt2", "this is subtask2", epc1.getId(),
+                LocalDateTime.of(2022,4,16,11,0), Duration.ofMinutes(60));
+
+        SubTask sbt3 = new SubTask("sbt3", "this is subtask3", epc2.getId(),
+                LocalDateTime.of(2022, 4,16,12,0), Duration.ofMinutes(60));
+
+        SubTask sbt4 = new SubTask("sbt4", "this is subtask4", epc2.getId(),
+                LocalDateTime.of(2022,4,16,13,0), Duration.ofMinutes(60));
+
+
+
+
+        manager.createSubTask(sbt1, sbt1.getEpicId());
+        manager.createSubTask(sbt2, sbt2.getEpicId());
+        manager.createSubTask(sbt3, sbt3.getEpicId());
+        manager.createSubTask(sbt4, sbt4.getEpicId());
 
         manager.getEpicByUin(epc1.getUin());
         manager.getEpicByUin(epc2.getUin());
@@ -95,7 +96,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             for (int i = 1; i < listOfStrings.size() - 2; i++) {
                 Task task = manager.fromString(listOfStrings.get(i));
                 if (task instanceof SubTask) {
-                    manager.createSubTaskWhileLoading((SubTask) task);
+                    manager.createSubTaskWhileLoading((SubTask) task, manager);
                 } else if (task != null && !(task instanceof Epic)) {
                     manager.createTaskWhileLoading(task);
                 }
@@ -147,7 +148,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public void createSubTask(final SubTask subtask, final int epicId) {
-        super.createSubTask(subtask, getManagerEpicsMap().get(epicId));
+        super.createSubTask(subtask, epicId);
         save();
     }
 
@@ -235,7 +236,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
         switch (temp[1]) {
             case "SUBTASK":
-                SubTask  subTask = new SubTask(temp[2], temp[4], getManagerEpicsMap().get(Integer.parseInt(temp[5])), LocalDateTime.parse(temp[6]),  Duration.parse(temp[7]));
+                SubTask  subTask = new SubTask(temp[2], temp[4], Integer.parseInt(temp[5]), LocalDateTime.parse(temp[6]),  Duration.parse(temp[7]));
                 subTask.setStatus(Status.valueOf(temp[3]));
                 subTask.setUin(Integer.parseInt(temp[0]));
                 return subTask;

@@ -145,14 +145,16 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    public void createSubTask(SubTask subtask, Epic epic) {
+    public void createSubTask(SubTask subtask, int epicId) {
 
         if (taskIsValid(subtask)) {
             uin += 1;
+            subtask.setEpicId(epicId);
             managerSubTasksMap.put(uin, subtask);
+
             subtask.setUin(uin);
-            epic.addSubTaskToEpicList(subtask);
-            epic.refreshEpicData();
+            getManagerEpicsMap().get(epicId).addSubTaskToEpicList(subtask);
+            getManagerEpicsMap().get(epicId).refreshEpicData();
             orderedTasksSet.add(subtask);
         }
     }
@@ -194,20 +196,21 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubTask(SubTask newSubtask) {
         if (managerSubTasksMap.containsKey(newSubtask.getId())) {
             SubTask oldSubTask = cloneSubTask(managerSubTasksMap.get(newSubtask.getId()));
-            Epic epic = oldSubTask.getEpic();
+            Epic epic = managerEpicsMap.get(oldSubTask.getEpicId());
             orderedTasksSet.remove(oldSubTask);
             managerSubTasksMap.remove(oldSubTask.getId());
 
             if (taskIsValid(newSubtask)) {
                 managerSubTasksMap.put(newSubtask.getId(), newSubtask);
                 orderedTasksSet.add(newSubtask);
+                if(epic.getSubTasks().contains(oldSubTask)){
                 epic.getSubTasks().remove(oldSubTask);
-                epic.getSubTasks().add(newSubtask);
+                epic.getSubTasks().add(newSubtask);}
                 epic.refreshEpicData();
                 epic.refreshEndTime();
             } else {
                 managerSubTasksMap.put(oldSubTask.getId(), oldSubTask);
-                oldSubTask.getEpic().refreshEpicData();
+               managerEpicsMap.get(oldSubTask.getEpicId()).refreshEpicData();
             }
         }
     }
@@ -322,7 +325,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public SubTask cloneSubTask(SubTask subTask) {
-        SubTask newSubTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getEpic(), subTask.getStartTime(), subTask.getDuration());
+        SubTask newSubTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getEpicId(), subTask.getStartTime(), subTask.getDuration());
         newSubTask.setUin(subTask.getId());
         newSubTask.setStatus(subTask.getStatus());
         return newSubTask;
@@ -339,14 +342,14 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    public void createSubTaskWhileLoading(SubTask subtask) {
+    public void createSubTaskWhileLoading(SubTask subtask, InMemoryTaskManager manager) {
 
         if (taskIsValid(subtask)) {
             uin = subtask.getUin();
             managerSubTasksMap.put(uin, subtask);
             subtask.setUin(uin);
-            subtask.getEpic().addSubTaskToEpicList(subtask);
-            subtask.getEpic().refreshEpicData();
+            manager.managerEpicsMap.get(subtask.getEpicId()).addSubTaskToEpicList(subtask);
+            manager.managerEpicsMap.get(subtask.getEpicId()).refreshEpicData();
             orderedTasksSet.add(subtask);
         }
     }
