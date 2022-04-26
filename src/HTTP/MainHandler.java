@@ -1,9 +1,7 @@
 package HTTP;
 
-import HTTP.adapters.TaskAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import manager.TaskManager;
@@ -11,7 +9,6 @@ import tasks.Task;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpResponse;
 import java.util.List;
@@ -26,6 +23,7 @@ public class MainHandler implements HttpHandler {
     public MainHandler(final TaskManager manager) {
         this.manager = manager;
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         this.exchange = exchange;
@@ -57,7 +55,7 @@ public class MainHandler implements HttpHandler {
         if (path.equals("/tasks") || path.toLowerCase().equals("/tasks/")) {
             exchange.sendResponseHeaders(200, 0);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-           String prioritizedJson =  gson.toJson(manager.getPrioritizedTask());
+            String prioritizedJson = gson.toJson(manager.getPrioritizedTask());
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(prioritizedJson.getBytes());
             }
@@ -78,13 +76,13 @@ public class MainHandler implements HttpHandler {
 
                 case "history":
                     exchange.sendResponseHeaders(200, 0);
-                                    List<Task> history = manager.history();
-               Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                String historyJson = gson.toJson(history);
-                try (OutputStream os = exchange.getResponseBody()) {
-                    os.write(historyJson.getBytes());
-                    exchange.close();
-                }
+                    List<Task> history = manager.history();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String historyJson = gson.toJson(history);
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(historyJson.getBytes());
+                        exchange.close();
+                    }
                     break;
 
                 default:
@@ -142,24 +140,23 @@ public class MainHandler implements HttpHandler {
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(js.getBytes());
                 exchange.close();
-
             }
         } else if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
-                StringBuilder sb = new StringBuilder(pathSplitted[3]);
-                sb.delete(0, 4);
-                if (isPositiveDigit(sb.toString())) {
-                    int id = Integer.parseInt(sb.toString());
-                    if (manager.getManagerTasksMap().containsKey(id)) {
-                        exchange.sendResponseHeaders(200, 0);
-                        Task task = manager.getTaskByUin(id);
-                        String taskSerialized = gson.toJson(task);
-                        try (OutputStream os = exchange.getResponseBody()) {
-                            os.write(taskSerialized.getBytes());
-                            exchange.close();
-                        }
-                    } else exchange.sendResponseHeaders(405, 0);
-                }else  exchange.sendResponseHeaders(405, 0);
-        }else exchange.sendResponseHeaders(400, 0);
+            StringBuilder sb = new StringBuilder(pathSplitted[3]);
+            sb.delete(0, 4);
+            if (isPositiveDigit(sb.toString())) {
+                int id = Integer.parseInt(sb.toString());
+                if (manager.getManagerTasksMap().containsKey(id)) {
+                    exchange.sendResponseHeaders(200, 0);
+                    Task task = manager.getTaskByUin(id);
+                    String taskSerialized = gson.toJson(task);
+                    try (OutputStream os = exchange.getResponseBody()) {
+                        os.write(taskSerialized.getBytes());
+                        exchange.close();
+                    }
+                } else exchange.sendResponseHeaders(405, 0);
+            } else exchange.sendResponseHeaders(405, 0);
+        } else exchange.sendResponseHeaders(400, 0);
     }
 
     void taskPOSThandler() {
@@ -167,17 +164,20 @@ public class MainHandler implements HttpHandler {
 
 
     void taskDELETEhandle() throws IOException {
-
         if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
             StringBuilder sb = new StringBuilder(pathSplitted[3]);
             sb.delete(0, 4);
             if (isPositiveDigit(sb.toString())) {
-                sendPositiveresponse("/tasks/task/?id=");
-            } else sendNegativeResponse();
+                exchange.sendResponseHeaders(200, 0);
+                int id = Integer.parseInt(sb.toString());
+                manager.deleteTaskById(id);
+
+            } else exchange.sendResponseHeaders(400, 0);
         } else if (pathSplitted.length == 3) {
-            sendPositiveresponse("/tasks/task/");
+            exchange.sendResponseHeaders(200, 0);
+            manager.clearTasks();
         } else
-            sendNegativeResponse();
+            exchange.sendResponseHeaders(400, 0);
     }
 
     void subTaskPOSThandle() {
@@ -187,13 +187,14 @@ public class MainHandler implements HttpHandler {
     }
 
     void subTaskGEThandle() throws IOException {
-       Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         if (pathSplitted.length == 3) {
             exchange.sendResponseHeaders(200, 0);
             String js = gson.toJson(manager.getAllSubTasksList());
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(js.getBytes());
-                exchange.close();}
+                exchange.close();
+            }
 
         } else if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
             StringBuilder sb = new StringBuilder(pathSplitted[3]);
@@ -209,8 +210,8 @@ public class MainHandler implements HttpHandler {
                         exchange.close();
                     }
                 } else exchange.sendResponseHeaders(405, 0);
-            }else  exchange.sendResponseHeaders(405, 0);
-        }else if(pathSplitted.length == 5 && pathSplitted[4].startsWith("?id=") &&pathSplitted[3].equals("epic")){
+            } else exchange.sendResponseHeaders(405, 0);
+        } else if (pathSplitted.length == 5 && pathSplitted[4].startsWith("?id=") && pathSplitted[3].equals("epic")) {
             StringBuilder sb = new StringBuilder(pathSplitted[4]);
             sb.delete(0, 4);
             if (isPositiveDigit(sb.toString())) {
@@ -228,10 +229,14 @@ public class MainHandler implements HttpHandler {
             StringBuilder sb = new StringBuilder(pathSplitted[3]);
             sb.delete(0, 4);
             if (isPositiveDigit(sb.toString())) {
-                sendPositiveresponse("/tasks/subtask/?id=");
-            } else sendNegativeResponse();
+                exchange.sendResponseHeaders(200, 0);
+                int id = Integer.parseInt(sb.toString());
+                manager.deleteSubTaskById(id);
+
+            } else exchange.sendResponseHeaders(400, 0);
         } else if (pathSplitted.length == 3) {
-            sendPositiveresponse("/tasks/subtask/");
+            exchange.sendResponseHeaders(200, 0);
+            manager.clearSubTasks();
         } else
             sendNegativeResponse();
 
@@ -239,13 +244,14 @@ public class MainHandler implements HttpHandler {
 
 
     void epicGEThandle() throws IOException {
-       Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         if (pathSplitted.length == 3) {
             exchange.sendResponseHeaders(200, 0);
             String js = gson.toJson(manager.getAllEpicsList());
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(js.getBytes());
-                exchange.close();}
+                exchange.close();
+            }
         } else if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
             StringBuilder sb = new StringBuilder(pathSplitted[3]);
             sb.delete(0, 4);
@@ -260,7 +266,7 @@ public class MainHandler implements HttpHandler {
                         exchange.close();
                     }
                 } else exchange.sendResponseHeaders(405, 0);
-            }else  exchange.sendResponseHeaders(405, 0);
+            } else exchange.sendResponseHeaders(405, 0);
         }
     }
 
@@ -269,10 +275,14 @@ public class MainHandler implements HttpHandler {
             StringBuilder sb = new StringBuilder(pathSplitted[3]);
             sb.delete(0, 4);
             if (isPositiveDigit(sb.toString())) {
-                sendPositiveresponse("/tasks/epic/?id=");
-            } else sendNegativeResponse();
+                exchange.sendResponseHeaders(200, 0);
+                int id = Integer.parseInt(sb.toString());
+                manager.deleteEpicById(id);
+
+            } else exchange.sendResponseHeaders(400, 0);
         } else if (pathSplitted.length == 3) {
-            sendPositiveresponse("/tasks/epic/");
+            exchange.sendResponseHeaders(200, 0);
+            manager.clearEpics();
         } else
             sendNegativeResponse();
     }
