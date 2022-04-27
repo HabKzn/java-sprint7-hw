@@ -1,6 +1,5 @@
-package HTTP.adapters;
+package HTTP;
 
-import HTTP.MainHandler;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -22,7 +21,7 @@ public class HttpTaskServer {
         try {
             this.manager = manager;
             server = HttpServer.create(new InetSocketAddress(PORT), 0);
-            server.createContext("/tasks", new MainHandler(manager));
+            server.createContext("/tasks", new Handler(manager));
         } catch (IOException e) {
             System.out.println("Ошибка при создании сервера");
             e.printStackTrace();

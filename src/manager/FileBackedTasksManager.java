@@ -78,6 +78,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         System.out.println(firstManager.equals(secondManager));
         System.out.println(firstManager);
         System.out.println(secondManager);
+
+        manager.createEpic(new Epic("newEpicName", "newEpicDescription"));
     }
 
     public  static FileBackedTasksManager loadFromFile(File file) {
@@ -105,11 +107,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             throw new ManagerSaveException("Ошибка при загрузке");
         }
         //тут восстанавливаем историю
+        if(listOfStrings.size()>0){
         String[] tempHistory = listOfStrings.get(listOfStrings.size() - 1).split(",");
         for (int i = 0; i < tempHistory.length; i++) {
             int historyElement = Integer.parseInt(tempHistory[i]);
             manager.getMemoryManager().add(manager.getTaskUniversal(historyElement));
-        }
+        }}
         manager.setUin(manager.getManagerEpicsMap().size() + manager.getManagerTasksMap().size() + manager.getManagerSubTasksMap().size());
         manager.save();
         return manager;
@@ -242,10 +245,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 return subTask;
             case "EPIC":
                 Epic epic = new Epic((temp[2]), temp[4] );
-                epic.setStartTime(LocalDateTime.parse(temp[5]));
-                epic.setDuration(Duration.parse(temp[6]));
-                epic.setStatus(Status.valueOf(temp[3]));
-                epic.setEndTime(LocalDateTime.parse(temp[7]));
+                if (!temp[5].equals("null")) {
+                    epic.setStartTime(null);
+                }
+                if (!temp[6].equals("null")) {
+                    epic.setDuration(Duration.parse(temp[6]));
+                }
+                if (!temp[3].equals("null")) {
+                    epic.setStatus(Status.valueOf(temp[3]));
+                }
+                if (!temp[7].equals("null")) {
+                    epic.setEndTime(LocalDateTime.parse(temp[7]));
+                }
                 epic.setUin(Integer.parseInt(temp[0]));
                 return epic;
 

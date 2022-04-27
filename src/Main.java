@@ -1,9 +1,5 @@
-import HTTP.adapters.HttpTaskServer;
-import HTTP.adapters.TaskAdapter;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import HTTP.HttpTaskServer;
 import manager.FileBackedTasksManager;
-import tasks.Task;
 
 import java.io.File;
 
@@ -13,22 +9,6 @@ public class Main {
 
   HttpTaskServer server = new HttpTaskServer(manager);
         server.start();
-
-//        System.out.println(gson.toJson(a));
-//        System.out.println(manager.getPrioritizedTask());
-//        Task task = new Task("name", "description",
-//                LocalDateTime.of(2022, 4, 17, 9, 0), Duration.ofMinutes(50));
-//        task.setUin(100500);
-//        Task task2 = new Task("name", "description",
-//                LocalDateTime.of(2022, 4, 17, 9, 0), Duration.ofMinutes(50));
-//        Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Task.class, new TaskAdapter()).create();
-//
-//        String json = gson.toJson(task);
-//        System.out.println(json);
-//        Task b = gson.fromJson(json, Task.class);
-//        System.out.println(b.toString());
-
-
     }
 }
 
