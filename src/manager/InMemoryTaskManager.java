@@ -42,6 +42,11 @@ public class InMemoryTaskManager implements TaskManager {
         return managerSubTasksMap;
     }
 
+    @Override
+    public ArrayList<SubTask> getEpicSubtasks(int id) {
+        return (ArrayList<SubTask>) ((Epic)getTaskUniversal(id)).getSubtasks();
+    }
+
     public Set<Task> getOrderedTasksSet() {
         return orderedTasksSet;
     }

@@ -1,0 +1,49 @@
+Tasks:
+[
+  {
+    "name": "Taskname",
+    "description": "Taskdescription",
+    "uin": 7,
+    "status": "DONE",
+    "duration": {
+      "seconds": 3600,
+      "nanos": 0
+    },
+    "startTime": {
+      "date": {
+        "year": 2024,
+        "month": 2,
+        "day": 3
+      },
+      "time": {
+        "hour": 12,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    }
+  },
+  {
+    "name": "Taskname2",
+    "description": "Taskdescription2",
+    "uin": 8,
+    "status": "IN_PROGRESS",
+    "duration": {
+      "seconds": 7200,
+      "nanos": 0
+    },
+    "startTime": {
+      "date": {
+        "year": 2055,
+        "month": 11,
+        "day": 3
+      },
+      "time": {
+        "hour": 12,
+        "minute": 0,
+        "second": 0,
+        "nano": 0
+      }
+    }
+  }
+]

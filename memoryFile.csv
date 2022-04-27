@@ -7,5 +7,6 @@ id,type,name,status,description,epic,startTime,duration,endTime
 6,SUBTASK,sbt4,NEW,this is subtask4,2,2022-04-16T13:00,PT1H,2022-04-16T14:00
 1,EPIC,epc1,NEW,this is epic N1,2022-04-16T10:00,PT2H,2022-04-16T12:00
 2,EPIC,epc2,NEW,this is epic N2,2022-04-16T12:00,PT2H,2022-04-16T14:00
+9,EPIC,newEpicName,NEW,newEpicDescription,null,null,null
 
-1,2,6,5,4,3,7,8
+6,5,4,3,7,8,1,2

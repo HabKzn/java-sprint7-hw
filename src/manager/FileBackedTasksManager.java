@@ -19,8 +19,7 @@ import java.util.List;
 public class FileBackedTasksManager extends InMemoryTaskManager {
     static File file;
 
-    public FileBackedTasksManager(String stringPath) {
-        file = new File(stringPath);
+    public FileBackedTasksManager(String stringPath) {file = new File(stringPath);
     }
 
     public static void main(String[] args)  {

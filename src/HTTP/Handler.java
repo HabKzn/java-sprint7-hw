@@ -244,8 +244,12 @@ public class Handler implements HttpHandler {
             StringBuilder sb = new StringBuilder(pathSplitted[4]);
             sb.delete(0, 4);
             if (isPositiveDigit(sb.toString())) {
-                System.out.println(Integer.parseInt(sb.toString()));
-                exchange.sendResponseHeaders(400, 0);
+                exchange.sendResponseHeaders(200, 0);
+                String json = gson.toJson(manager.getEpicSubtasks(Integer.parseInt(sb.toString())));
+                try (OutputStream os = exchange.getResponseBody()) {
+                    os.write(json.getBytes());
+                    exchange.close();
+                }
             } else {
                 exchange.sendResponseHeaders(400, 0);
             }
