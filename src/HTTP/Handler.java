@@ -149,7 +149,7 @@ public class Handler implements HttpHandler {
     }
 
     void taskGEThandle() throws IOException {
-        GsonBuilder gbuilder = new GsonBuilder().setPrettyPrinting();
+        GsonBuilder gbuilder = new GsonBuilder();
         gson = gbuilder.create();
         if (pathSplitted.length == 3) {
             exchange.sendResponseHeaders(200, 0);
@@ -192,7 +192,6 @@ public class Handler implements HttpHandler {
                 exchange.sendResponseHeaders(200, 0);
                 int id = Integer.parseInt(sb.toString());
                 manager.deleteTaskById(id);
-
             } else exchange.sendResponseHeaders(400, 0);
         } else if (pathSplitted.length == 3) {
             exchange.sendResponseHeaders(200, 0);
@@ -204,8 +203,9 @@ public class Handler implements HttpHandler {
     void subTaskPOSThandle() throws IOException {
         exchange.sendResponseHeaders(200, 0);
         SubTask subTask = gson.fromJson(body, SubTask.class);
-        manager.createTask(subTask);
-        manager.updateTask(subTask);
+        manager.createSubTask(subTask, subTask.getEpicId());
+        manager.updateSubTask(subTask);
+        manager.updateEpic((Epic)manager.getTaskUniversal(subTask.getEpicId()));
     }
 
     void epicPOSThandle() throws IOException {
@@ -216,7 +216,7 @@ public class Handler implements HttpHandler {
     }
 
     void subTaskGEThandle() throws IOException {
-        gson = new GsonBuilder().setPrettyPrinting().create();
+        gson = new GsonBuilder().create();
         if (pathSplitted.length == 3) {
             exchange.sendResponseHeaders(200, 0);
             String js = gson.toJson(manager.getAllSubTasksList());
@@ -253,7 +253,6 @@ public class Handler implements HttpHandler {
             } else {
                 exchange.sendResponseHeaders(400, 0);
             }
-
         }
     }
 
@@ -272,12 +271,11 @@ public class Handler implements HttpHandler {
             manager.clearSubTasks();
         } else
             exchange.sendResponseHeaders(400, 0);
-
     }
 
 
     void epicGEThandle() throws IOException {
-        gson = new GsonBuilder().setPrettyPrinting().create();
+        gson = new GsonBuilder().create();
         if (pathSplitted.length == 3) {
             exchange.sendResponseHeaders(200, 0);
             String js = gson.toJson(manager.getAllEpicsList());
