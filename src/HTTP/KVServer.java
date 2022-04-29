@@ -1,3 +1,5 @@
+package HTTP;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sun.net.httpserver.HttpExchange;
@@ -74,10 +76,11 @@ public class KVServer {
             }
         });
         server.createContext("/load", (h) -> {
-            String key = h.getRequestURI().getPath().substring("/save/".length());
+
+            String key = h.getRequestURI().getPath().substring("/load/".length());
             Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
-            List<Task> tasksList = new Gson().fromJson(data.get(key), listType);
-            System.out.println(tasksList.toString());
+            List<Task> tasks = new Gson().fromJson(data.get(key), listType);
+            System.out.println(tasks.toString());
             // TODO Добавьте получение значения по ключу
         });
     }

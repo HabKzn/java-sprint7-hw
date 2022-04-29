@@ -27,17 +27,8 @@ public class HttpTaskServer {
             e.printStackTrace();
         }
     }
-
-    public int getPORT() {
-        return PORT;
-    }
-
-    public TaskManager getManager() {
+      public TaskManager getManager() {
         return manager;
-    }
-
-    public HttpServer getServer() {
-        return server;
     }
 
     public void start() {
@@ -48,27 +39,5 @@ public class HttpTaskServer {
         server.stop(1);
     }
 
-    public static class EpicAdapter extends TypeAdapter<Epic> {
 
-        @Override
-        public void write(final JsonWriter jsonWriter, final Epic epic) throws IOException {
-
-        }
-
-        @Override
-        public Epic read(final JsonReader jsonReader) throws IOException {
-            return null;
-        }
-    }
-
-    public static class ArrayListOfTasksAdapter extends TypeAdapter<ArrayList<Task>> {
-        @Override
-        public void write(final JsonWriter jsonWriter, final ArrayList<Task> tasks) throws IOException {
-        }
-
-        @Override
-        public ArrayList<Task> read(final JsonReader jsonReader) throws IOException {
-            return null;
-        }
-    }
 }
