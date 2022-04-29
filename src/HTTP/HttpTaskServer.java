@@ -1,16 +1,10 @@
 package HTTP;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import com.sun.net.httpserver.HttpServer;
 import manager.TaskManager;
-import tasks.Epic;
-import tasks.Task;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 
 public class HttpTaskServer {
     final int PORT = 8080;

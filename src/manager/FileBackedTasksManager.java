@@ -19,17 +19,22 @@ import java.util.List;
 public class FileBackedTasksManager extends InMemoryTaskManager {
     static File file;
 
-    public FileBackedTasksManager(String stringPath) {file = new File(stringPath);
+    public FileBackedTasksManager(String stringPath) {
+        file = new File(stringPath);
     }
 
-    public static void main(String[] args)  {
+    public FileBackedTasksManager() {
+    }
+
+
+    public static void main(String[] args) {
         FileBackedTasksManager manager = (FileBackedTasksManager) Managers.getFileBacked();
         Epic epc1 = new Epic("epc1", "this is epic N1");
         Epic epc2 = new Epic("epc2", "this is epic N2");
         manager.createEpic(epc1);
         manager.createEpic(epc2);
         SubTask sbt1 = new SubTask("sbt1", "this is subtask1", epc1.getId(),
-                LocalDateTime.of(2022,4,16,10,0), Duration.ofMinutes(60));
+                LocalDateTime.of(2022, 4, 16, 10, 0), Duration.ofMinutes(60));
 
         SubTask sbt2 = new SubTask("sbt2", "this is subtask2", epc1.getId(),
                 LocalDateTime.of(2022,4,16,11,0), Duration.ofMinutes(60));
@@ -81,7 +86,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         manager.createEpic(new Epic("newEpicName", "newEpicDescription"));
     }
 
-    public  static FileBackedTasksManager loadFromFile(File file) {
+    public static FileBackedTasksManager loadFromFile(File file) {
         List<String> listOfStrings;
         FileBackedTasksManager manager;
         try {
@@ -117,7 +122,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return manager;
     }
 
-    public void save() {
+    public void save()  {
         try (PrintWriter pw = new PrintWriter(file.getName())) {
             pw.println("id,type,name,status,description,epic,startTime,duration,endTime");
             for (Task task : getAllTasksList()) {

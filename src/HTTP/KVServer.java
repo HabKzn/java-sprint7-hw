@@ -77,11 +77,17 @@ public class KVServer {
         });
         server.createContext("/load", (h) -> {
 
-            String key = h.getRequestURI().getPath().substring("/load/".length());
-            Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
-            List<Task> tasks = new Gson().fromJson(data.get(key), listType);
-            System.out.println(tasks.toString());
-            // TODO Добавьте получение значения по ключу
+            try {
+                String key = h.getRequestURI().getPath().substring("/load/".length());
+                String tasks = data.get(key);
+                byte[] tasksBytes = tasks.getBytes("UTF-8");
+                h.getResponseHeaders().add("Content-Type", "application/json");
+                h.sendResponseHeaders(200, tasksBytes.length);
+                h.getResponseBody().write(tasksBytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }h.close();
+          // TODO Добавьте получение значения по ключу
         });
     }
 
