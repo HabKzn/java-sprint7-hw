@@ -347,14 +347,14 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    public void createSubTaskWhileLoading(SubTask subtask, InMemoryTaskManager manager) {
+    public void createSubTaskWhileLoading(SubTask subtask) {
 
         if (taskIsValid(subtask)) {
             uin = subtask.getUin();
             managerSubTasksMap.put(uin, subtask);
             subtask.setUin(uin);
-            manager.managerEpicsMap.get(subtask.getEpicId()).addSubTaskToEpicList(subtask);
-            manager.managerEpicsMap.get(subtask.getEpicId()).refreshEpicData();
+            managerEpicsMap.get(subtask.getEpicId()).addSubTaskToEpicList(subtask);
+            managerEpicsMap.get(subtask.getEpicId()).refreshEpicData();
             orderedTasksSet.add(subtask);
         }
     }
@@ -365,7 +365,6 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setUin(uin);
         epic.setStatus(epic.getStatus());
     }
-
 
 }
 

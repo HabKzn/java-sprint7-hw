@@ -102,7 +102,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             for (int i = 1; i < listOfStrings.size() - 2; i++) {
                 Task task = manager.fromString(listOfStrings.get(i));
                 if (task instanceof SubTask) {
-                    manager.createSubTaskWhileLoading((SubTask) task, manager);
+                    manager.createSubTaskWhileLoading((SubTask) task);
                 } else if (task != null && !(task instanceof Epic)) {
                     manager.createTaskWhileLoading(task);
                 }
