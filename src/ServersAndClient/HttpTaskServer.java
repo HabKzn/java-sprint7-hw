@@ -1,4 +1,4 @@
-package HTTP;
+package ServersAndClient;
 
 import com.sun.net.httpserver.HttpServer;
 import manager.TaskManager;
@@ -32,6 +32,4 @@ public class HttpTaskServer {
     public void stop() {
         server.stop(1);
     }
-
-
 }

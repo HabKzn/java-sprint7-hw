@@ -1,6 +1,4 @@
-package HTTP;
-
-import manager.ManagerSaveException;
+package Exceptions;
 
 public class KvTaskClientException extends ManagerSaveException {
     public KvTaskClientException(final String message) {

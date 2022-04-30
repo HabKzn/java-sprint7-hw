@@ -1,17 +1,12 @@
-package HTTP;
+package ServersAndClient;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-import tasks.Task;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,8 +15,8 @@ import java.util.Map;
 public class KVServer {
     public static final int PORT = 8078;
     private final String API_KEY;
-    private HttpServer server;
-    private Map<String, String> data = new HashMap<>();
+    private final HttpServer server;
+    private final Map<String, String> data = new HashMap<>();
 
     public KVServer() throws IOException {
         API_KEY = generateApiKey();
@@ -108,12 +103,11 @@ public class KVServer {
     }
 
     protected String readText(HttpExchange h) throws IOException {
-        return new String(h.getRequestBody().readAllBytes(), "UTF-8");
+        return new String(h.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
     }
 
     protected void sendText(HttpExchange h, String text) throws IOException {
-        //byte[] resp = jackson.writeValueAsBytes(obj);
-        byte[] resp = text.getBytes("UTF-8");
+        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
         h.getResponseHeaders().add("Content-Type", "application/json");
         h.sendResponseHeaders(200, resp.length);
         h.getResponseBody().write(resp);

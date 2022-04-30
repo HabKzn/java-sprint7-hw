@@ -1,7 +1,7 @@
 package manager;
 
-import HTTP.KVServer;
-import HTTP.kvTaskClient;
+import ServersAndClient.KVServer;
+import ServersAndClient.kvTaskClient;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import tasks.Epic;

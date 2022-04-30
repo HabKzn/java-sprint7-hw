@@ -1,4 +1,4 @@
-package HTTP;
+package ServersAndClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,6 +30,14 @@ public class Handler implements HttpHandler {
 
     public Handler(final TaskManager manager) {
         this.manager = manager;
+    }
+
+    private static boolean isPositiveDigit(String s) throws NumberFormatException {
+        try {
+            return Integer.parseInt(s) >= 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     @Override
@@ -67,9 +75,8 @@ public class Handler implements HttpHandler {
         }
     }
 
-
     void getHandler() throws IOException {
-        if (path.equals("/tasks") || path.toLowerCase().equals("/tasks/")) {
+        if (path.equals("/tasks") || path.equalsIgnoreCase("/tasks/")) {
             exchange.sendResponseHeaders(200, 0);
             gson = new GsonBuilder().create();
             String prioritizedJson = gson.toJson(manager.getPrioritizedTask());
@@ -113,7 +120,6 @@ public class Handler implements HttpHandler {
 
             case "task":
                 taskDELETEhandle();
-                ;
                 break;
 
             case "subtask":
@@ -183,7 +189,6 @@ public class Handler implements HttpHandler {
         manager.updateTask(task);
     }
 
-
     void taskDELETEhandle() throws IOException {
         if (pathSplitted.length == 4 && pathSplitted[3].startsWith("?id=")) {
             StringBuilder sb = new StringBuilder(pathSplitted[3]);
@@ -205,14 +210,14 @@ public class Handler implements HttpHandler {
         SubTask subTask = gson.fromJson(body, SubTask.class);
         manager.createSubTask(subTask, subTask.getEpicId());
         manager.updateSubTask(subTask);
-        manager.updateEpic((Epic)manager.getTaskUniversal(subTask.getEpicId()));
+        manager.updateEpic((Epic) manager.getTaskUniversal(subTask.getEpicId()));
     }
 
     void epicPOSThandle() throws IOException {
         exchange.sendResponseHeaders(200, 0);
         Epic epic = gson.fromJson(body, Epic.class);
-        manager.createTask(epic);
-        manager.updateTask(epic);
+        manager.createEpic(epic);
+        manager.updateEpic(epic);
     }
 
     void subTaskGEThandle() throws IOException {
@@ -273,7 +278,6 @@ public class Handler implements HttpHandler {
             exchange.sendResponseHeaders(400, 0);
     }
 
-
     void epicGEThandle() throws IOException {
         gson = new GsonBuilder().create();
         if (pathSplitted.length == 3) {
@@ -323,13 +327,5 @@ public class Handler implements HttpHandler {
         if (thirdElementSplitted[0].equals("") && isPositiveDigit(thirdElementSplitted[2])) {
             return Integer.parseInt(thirdElementSplitted[2]);
         } else return -1;
-    }
-
-    private static boolean isPositiveDigit(String s) throws NumberFormatException {
-        try {
-            return Integer.parseInt(s) >= 0;
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 }

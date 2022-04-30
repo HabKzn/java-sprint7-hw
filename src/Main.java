@@ -1,13 +1,18 @@
-import HTTP.KVServer;
+import ServersAndClient.HttpTaskServer;
+import ServersAndClient.KVServer;
+import manager.Managers;
+import manager.TaskManager;
 
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-//        FileBackedTasksManager manager = FileBackedTasksManager.loadFromFile(new File("memoryFile.csv"));
-//  HttpTaskServer server = new HttpTaskServer(manager);
-//        server.start();
-       new KVServer().start();
+        KVServer kvServer = new KVServer();
+        kvServer.start();
+        TaskManager manager = Managers.getDefault();
+        HttpTaskServer server = new HttpTaskServer(manager);
+        server.start();
+
     }
 }
 

@@ -1,4 +1,6 @@
-package HTTP;
+package ServersAndClient;
+
+import Exceptions.KvTaskClientException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -48,7 +50,7 @@ public class kvTaskClient {
         HttpRequest request = requestBuilder.GET().uri(URI.create(url + "/register")).version(HttpClient.Version.HTTP_1_1)
                 .header("Accept", "application/json")
                 .build();
-        HttpResponse<String> response = null;
+        HttpResponse<String> response;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
