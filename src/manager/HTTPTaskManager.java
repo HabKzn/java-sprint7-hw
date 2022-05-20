@@ -1,7 +1,7 @@
 package manager;
 
 import ServersAndClient.KVServer;
-import ServersAndClient.kvTaskClient;
+import ServersAndClient.KvTaskClient;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import tasks.Epic;
@@ -18,44 +18,44 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HTTPTaskManager extends FileBackedTasksManager {
-    kvTaskClient client;
-
+    private KvTaskClient client;
+    private Gson gson;
     public HTTPTaskManager(URI url) {
-        client = new kvTaskClient(url);
+        client = new KvTaskClient(url);
     }
 
     @Override
     public void save() {
-        Gson gson = new Gson();
+        gson = new Gson();
         List<Integer> historyList = new ArrayList<>();
         for(Task task:history()){
             historyList.add(task.getId());
         }
 
         String tasks = gson.toJson(getAllTasksList());
-        String SubTasks = gson.toJson(getAllSubTasksList());
-        String Epics = gson.toJson(getAllEpicsList());
+        String subTasks = gson.toJson(getAllSubTasksList());
+        String epics = gson.toJson(getAllEpicsList());
         String history = gson.toJson(historyList);
 
         try {
-            client.put("1", tasks);
-            client.put("2", Epics);
-            client.put("3", SubTasks);
-            client.put("4", history);
+            client.put("tasksKey", tasks);
+            client.put("epicsKey", epics);
+            client.put("subTasksKey", subTasks);
+            client.put("historyKey", history);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-@Override
-    public void createTaskWhileLoading(Task task) {
+
+    private void createTaskWhileLoad(Task task) {
         if (taskIsValid(task)) {
             getManagerTasksMap().put(task.getId(), task);
             orderedTasksSet.add(task);
         }
     }
 
-    public void createSubTaskWhileLoading(SubTask subtask) {
+    private void createSubTaskWhileLoad(SubTask subtask) {
         if (taskIsValid(subtask)) {
             getManagerSubTasksMap().put(subtask.getId(), subtask);
             getManagerEpicsMap().get(subtask.getEpicId()).refreshEpicData();
@@ -63,46 +63,44 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         }
     }
 
-    public void createEpicWhileLoading(Epic epic) {
+    private void createEpicWhileLoad(Epic epic) {
         getManagerEpicsMap().put(epic.getId(), epic);
     }
 
-    public static HTTPTaskManager loadFromClient(kvTaskClient client) {
+    private static HTTPTaskManager loadFromClient(KvTaskClient client) {
 
         HTTPTaskManager loadedManager = new HTTPTaskManager(client.getUrl());
 
         Type TaskListType = new TypeToken<ArrayList<Task>>() {
         }.getType();
-        List<Task> tasks = new Gson().fromJson(client.load("1"), TaskListType);
+        List<Task> tasks = new Gson().fromJson(client.load("tasksKey"), TaskListType);
 
         Type EpicListType = new TypeToken<ArrayList<Epic>>() {
         }.getType();
-        List<Epic> epics = new Gson().fromJson(client.load("2"), EpicListType);
+        List<Epic> epics = new Gson().fromJson(client.load("epicsKey"), EpicListType);
 
         Type SubTaskListType = new TypeToken<ArrayList<SubTask>>() {
         }.getType();
-        List<SubTask> subTasks = new Gson().fromJson(client.load("3"), SubTaskListType);
+        List<SubTask> subTasks = new Gson().fromJson(client.load("subTasksKey"), SubTaskListType);
 
         Type historylistType = new TypeToken<ArrayList<Integer>>() {
         }.getType();
-        List<Integer> history = new Gson().fromJson(client.load("4"), historylistType);
+        List<Integer> history = new Gson().fromJson(client.load("historyKey"), historylistType);
 
         for (Task task : tasks) {
-            loadedManager.createTaskWhileLoading(task);// Тут загвоздка
+            loadedManager.createTaskWhileLoad(task);
         }
         for (Epic epic : epics) {
-            loadedManager.createEpicWhileLoading(epic);
+            loadedManager.createEpicWhileLoad(epic);
         }
         for (SubTask subTask : subTasks) {
-            loadedManager.createSubTaskWhileLoading(subTask);
+            loadedManager.createSubTaskWhileLoad(subTask);
         }
         loadedManager.setUin(loadedManager.getManagerEpicsMap().size() + loadedManager.getManagerTasksMap().size()
                 + loadedManager.getManagerSubTasksMap().size());
         for (int i = 0; i < history.size(); i++) {
             loadedManager.getMemoryManager().add(loadedManager.getTaskUniversal(history.get(i)));
         }
-
-
         return loadedManager;
     }
     public static void main(String[] args) {
@@ -158,10 +156,10 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         manager.updateTask(task2);
         manager.getTaskByUin(8);
 
-        System.out.println(manager.client.load("1"));
-        System.out.println(manager.client.load("2"));
-        System.out.println(manager.client.load("3"));
-        System.out.println(manager.client.load("4"));
+        System.out.println(manager.client.load("tasksKey"));
+        System.out.println(manager.client.load("epicsKey"));
+        System.out.println(manager.client.load("subTasksKey"));
+        System.out.println(manager.client.load("historyKey"));
 
         HTTPTaskManager newManager = loadFromClient(manager.client);
         String firstManager = manager.getMemoryManager().getTasks().toString();

@@ -41,7 +41,7 @@ public class Handler implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) {
         gson = new Gson();
         this.exchange = exchange;
         String method = exchange.getRequestMethod();
@@ -49,7 +49,11 @@ public class Handler implements HttpHandler {
         this.path = requestURI.toString().toLowerCase();
         pathSplitted = path.split("/");
         InputStream is = exchange.getRequestBody();
-        body = new String(is.readAllBytes(), DEFAULT_CHARSET);
+        try {
+            body = new String(is.readAllBytes(), DEFAULT_CHARSET);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
         try {
@@ -71,7 +75,11 @@ public class Handler implements HttpHandler {
             }
             exchange.close();
         } catch (IOException e) {
-            exchange.sendResponseHeaders(405, 0);
+            try {
+                exchange.sendResponseHeaders(405, 0);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 

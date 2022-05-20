@@ -8,13 +8,13 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class kvTaskClient {
-    String API_KEY;
-    HttpRequest.Builder requestBuilder = HttpRequest.newBuilder();
-    HttpClient client = HttpClient.newHttpClient();
-    URI url;
+public class KvTaskClient {
+    private String API_KEY;
+    private HttpRequest.Builder requestBuilder = HttpRequest.newBuilder();
+    private HttpClient client = HttpClient.newHttpClient();
+    private URI url;
 
-    public kvTaskClient(URI url) {
+    public KvTaskClient(URI url) {
         this.url = url;
         API_KEY = registerApiKey();
     }

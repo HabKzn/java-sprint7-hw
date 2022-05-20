@@ -11,18 +11,10 @@ public class HttpTaskServer {
     private TaskManager manager;
     private HttpServer server;
 
-    public HttpTaskServer(TaskManager manager) {
-        try {
+    public HttpTaskServer(TaskManager manager) throws IOException {
             this.manager = manager;
             server = HttpServer.create(new InetSocketAddress(PORT), 0);
             server.createContext("/tasks", new Handler(manager));
-        } catch (IOException e) {
-            System.out.println("Ошибка при создании сервера");
-            e.printStackTrace();
-        }
-    }
-      public TaskManager getManager() {
-        return manager;
     }
 
     public void start() {

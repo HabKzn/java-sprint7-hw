@@ -75,7 +75,7 @@ public class KVServer {
             try {
                 String key = h.getRequestURI().getPath().substring("/load/".length());
                 String tasks = data.get(key);
-                byte[] tasksBytes = tasks.getBytes("UTF-8");
+                byte[] tasksBytes = tasks.getBytes(StandardCharsets.UTF_8);
                 h.getResponseHeaders().add("Content-Type", "application/json");
                 h.sendResponseHeaders(200, tasksBytes.length);
                 h.getResponseBody().write(tasksBytes);
